@@ -75,6 +75,7 @@ func initConfig() {
 		// Search config in home directory with name ".ocmc" (without extension).
 		viper.AddConfigPath(home)
 		viper.SetConfigName(".ocmc")
+		viper.SetConfigType("yaml")
 	}
 
 	viper.AutomaticEnv() // read in environment variables that match

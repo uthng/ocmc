@@ -14,7 +14,10 @@
 
 package main
 
-import "github.com/uthng/ocmc/cmd"
+import (
+    //"github.com/uthng/common/log"
+    "github.com/uthng/ocmc/cmd"
+)
 
 func main() {
 	cmd.Execute()

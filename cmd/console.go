@@ -18,8 +18,10 @@ import (
     //"fmt"
 
     "github.com/spf13/cobra"
+    "github.com/spf13/viper"
 
     "github.com/gdamore/tcell"
+    "github.com/mitchellh/mapstructure"
 
     "github.com/uthng/ocmc/console"
     "github.com/uthng/ocmc/pages"
@@ -63,66 +65,42 @@ func initApp() {
     if err != nil {
         panic(err)
     }
+    app.GetPages().AddPage("home", pageHome, true, true)
 
-    pageProject, err := pages.NewPageProject("Projects")
-    if err != nil {
-        panic(err)
+    // Build 1st page cluster
+    data := GetClusterConfig()
+    data.App = app
+    if len(data.Configs) > 0 {
+        pageCluster, err := pages.NewPageCluster(data.Configs[0].Name, data)
+        if err != nil {
+            panic(err)
+        }
+        app.GetPages().AddPage(data.Configs[0].Name, pageCluster, true, true)
     }
 
-    app.GetPages().AddPage("home", pageHome, true, true)
-    app.GetPages().AddPage("project", pageProject, true, true)
+    //app.GetPages().SwitchToPage("home")
 
-    app.GetPages().SwitchToPage("home")
-
-    populateProjectList()
-    //pageHome := createHomePage()
-    //app.pages.AddPage("Home", pageHome, true, true)
-
-    // Create Project Page
-    //createProjectPage()
-
-    // Initialize toolbar with app buttons
-    //createToolbar()
-
-    //app.pages.SwitchToPage("Home")
-
-    // Run
-    //app.console.SetRoot(flex, true)
-    if err := app.Run(); err != nil {
+    if err := app.SetFocus(app.GetPages()).Run(); err != nil {
         panic("Error running application")
     }
 }
 
-// createPage Setup all layout's elements
-//func createHomePage() tview.Primitive {
-    //textView := tview.NewTextView().
-                //SetDynamicColors(true).
-                //SetRegions(true)
+func GetClusterConfig() pages.PageClusterData {
+    data := pages.PageClusterData{}
 
-    //fmt.Fprintf(textView, "%s", textPageHome)
-    //textView.SetBorder(true)
-    //textView.SetTextAlign(tview.AlignCenter).SetTextColor(tcell.ColorDarkViolet)
-
-    //return textView
-//}
-
-func populateProjectList() error {
-    page, err := app.GetPages().GetPage("project")
-    if err != nil {
-        return err
+    configClusters := viper.Get("clusters").([]interface{})
+    for _, cluster := range configClusters {
+        m := make(map[string]interface{})
+        for k, v := range cluster.(map[interface{}]interface{}) {
+            m[k.(string)] = v
+        }
+        config := pages.ClusterConfig{}
+        mapstructure.Decode(m, &config)
+        data.Configs = append(data.Configs, config)
     }
 
-    projects, err := page.GetElemList("projects")
-    if err != nil {
-        return err
-    }
-
-    projects.AddItem("TVL PPD FR", "Travel PPD FR cluster", 0, nil)
-    projects.AddItem("TVL PPD NL", "Travel PPD NL cluster", 0, nil)
-    projects.AddItem("TVL PRD FR", "Travel PRD FR cluster", 0, nil)
-    projects.AddItem("TVL PRD NL", "Travel PRD NL cluster", 0, nil)
-
-    return nil
+    //fmt.Printf("%v\n", data.Configs)
+    return data
 }
 
 func handlerKeyEvent(event *tcell.EventKey) *tcell.EventKey {
@@ -147,11 +125,11 @@ func handlerKeyEvent(event *tcell.EventKey) *tcell.EventKey {
     //case tcell.KeyPgUp:
     //case tcell.KeyPgDn:
     case tcell.KeyF2:
-        app.GetPages().SwitchToPage("project")
-        page, _ := app.GetPages().GetPage("project")
-        projects, _ := page.GetElemList("projects")
+        //app.GetPages().SwitchToPage("cluster")
+        //page, _ := app.GetPages().GetPage("TVL PPD FR")
+        //clusters, _ := page.GetElemList("list_clusters")
 
-        app.SetFocus(projects)
+        //app.SetFocus(clusters)
 
     case tcell.KeyF10:
         app.Stop()

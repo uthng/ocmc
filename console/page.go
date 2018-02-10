@@ -20,6 +20,8 @@ type Page struct {
 
     containers map[string]*tview.Flex
     elems map[string]interface{}
+
+    data interface{}
 }
 
 func NewPage() *Page {
@@ -127,6 +129,10 @@ func (p *Page) SetContainerDirection(container string, direction int) error {
     }
 
     return nil
+}
+
+func (p *Page) BindData(data interface{}) {
+    p.data = data
 }
 
 func (p *Page) GetElemBox(name string) (*tview.Box, error) {
