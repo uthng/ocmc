@@ -70,8 +70,9 @@ func initApp() {
     // Build 1st page cluster
     data := GetClusterConfig()
     data.App = app
+    data.PageName = data.Configs[0].Name
     if len(data.Configs) > 0 {
-        pageCluster, err := pages.NewPageCluster(data.Configs[0].Name, data)
+        pageCluster, err := pages.NewPageCluster(data)
         if err != nil {
             panic(err)
         }
@@ -85,8 +86,8 @@ func initApp() {
     }
 }
 
-func GetClusterConfig() pages.PageClusterData {
-    data := pages.PageClusterData{}
+func GetClusterConfig() *pages.PageClusterData {
+    data := &pages.PageClusterData{}
 
     configClusters := viper.Get("clusters").([]interface{})
     for _, cluster := range configClusters {
