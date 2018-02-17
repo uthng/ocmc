@@ -3,7 +3,7 @@ package console
 import (
     //"fmt"
 
-    //"github.com/gdamore/tcell"
+    "github.com/gdamore/tcell"
     "github.com/rivo/tview"
 
 )
@@ -35,6 +35,30 @@ func NewApp() *App {
 
     app.SetRoot(flex, true)
 
+    // Override global Styles variable for look & feel
+    tview.Styles = struct {
+        PrimitiveBackgroundColor    tcell.Color // Main background color for primitives.
+        ContrastBackgroundColor     tcell.Color // Background color for contrasting elements.
+        MoreContrastBackgroundColor tcell.Color // Background color for even more contrasting elements.
+        BorderColor                 tcell.Color // Box borders.
+        TitleColor                  tcell.Color // Box titles.
+        GraphicsColor               tcell.Color // Graphics.
+        PrimaryTextColor            tcell.Color // Primary text.
+        SecondaryTextColor          tcell.Color // Secondary text (e.g. labels).
+        TertiaryTextColor           tcell.Color // Tertiary text (e.g. subtitles, notes).
+        InverseTextColor            tcell.Color // Text on primary-colored backgrounds.
+    }{
+        PrimitiveBackgroundColor:    tcell.ColorBlack,
+        ContrastBackgroundColor:     tcell.ColorBlue,
+        MoreContrastBackgroundColor: tcell.ColorGreen,
+        BorderColor:                 tcell.ColorWhite,
+        TitleColor:                  tcell.ColorWhite,
+        GraphicsColor:               tcell.ColorWhite,
+        PrimaryTextColor:            tcell.ColorWhite,
+        SecondaryTextColor:          tcell.ColorYellow,
+        TertiaryTextColor:           tcell.ColorGreen,
+        InverseTextColor:            tcell.ColorBlue,
+    }
     return app
 }
 
