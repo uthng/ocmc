@@ -25,6 +25,7 @@ import (
 
     "github.com/uthng/ocmc/console"
     "github.com/uthng/ocmc/pages"
+    "github.com/uthng/ocmc/types"
 
 )
 
@@ -86,8 +87,8 @@ func initApp() {
     }
 }
 
-func GetClusterConfig() *pages.PageClusterData {
-    data := &pages.PageClusterData{}
+func GetClusterConfig() *types.PageClusterData {
+    data := &types.PageClusterData{}
 
     configClusters := viper.Get("clusters").([]interface{})
     for _, cluster := range configClusters {
@@ -95,7 +96,7 @@ func GetClusterConfig() *pages.PageClusterData {
         for k, v := range cluster.(map[interface{}]interface{}) {
             m[k.(string)] = v
         }
-        config := pages.ClusterConfig{}
+        config := types.ClusterConfig{}
         mapstructure.Decode(m, &config)
         data.Configs = append(data.Configs, config)
     }
