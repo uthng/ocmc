@@ -21,8 +21,10 @@ import (
 )
 
 /////////////// DECLARATION OF GLOBAL VARIABLES ///////////////////
-var swarmServices []swarm.Service
-var swarmNetworks []docker_types.NetworkResource
+var swarmServices       []swarm.Service
+var swarmTasks          []swarm.Task
+var swarmNodes          []swarm.Node
+var swarmNetworks       []docker_types.NetworkResource
 
 // NewModuleDocker initializes a new module for swarm cluster.
 //

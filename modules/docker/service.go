@@ -20,6 +20,8 @@ import (
     //"github.com/uthng/ocmc/pages"
 )
 
+// setupLayoutService initializes zone containing different elements of
+// service
 func setupLayoutService(container string, page *console.Page) error {
     err := setupTableService(container, page)
     if err != nil {
@@ -29,7 +31,8 @@ func setupLayoutService(container string, page *console.Page) error {
     return nil
 }
 
-
+// setupTableService initializes a table contaning services and
+// handles key event for navigation
 func setupTableService(container string, page *console.Page) error {
     var tableService *tview.Table
 
@@ -49,6 +52,13 @@ func setupTableService(container string, page *console.Page) error {
         if err != nil {
             return err
         }
+
+        // Add new container to include 2 tables: service atttributes and containers
+        err = page.AddContainer(container, "display_details", tview.FlexRow, 0, 3, false)
+        if err != nil {
+            return err
+        }
+
     }
 
     // Clear and draw table header
@@ -70,11 +80,13 @@ func setupTableService(container string, page *console.Page) error {
 
     // Point to 1st elem of service table
     //tableService.Select(1, 0)
-    setupTableServiceAttribute(tableService.GetCell(1, 0).Text, container, page)
+    setupTableServiceAttributes(tableService.GetCell(1, 0).Text, "display_details", page)
+    setupTableServiceContainers(tableService.GetCell(1, 0).Text, "display_details", page)
 
     // Handle Enter key event on each service
     tableService.SetSelectedFunc(func(row int, column int) {
-        setupTableServiceAttribute(tableService.GetCell(row, column).Text, container, page)
+        setupTableServiceAttributes(tableService.GetCell(row, column).Text, "display_details", page)
+        setupTableServiceContainers(tableService.GetCell(row, column).Text, "display_details", page)
     })
 
     // Handle other event key than Enter
@@ -97,7 +109,9 @@ func setupTableService(container string, page *console.Page) error {
     return nil
 }
 
-func setupTableServiceAttribute(service string, container string, page *console.Page) error {
+// setupTableServiceAttributes create a table containing service attributes
+// and handles key events for navigaition
+func setupTableServiceAttributes(service string, container string, page *console.Page) error {
     var table *tview.Table
     var attributes = make(map[string]string)
     var keyAttributes []string
@@ -113,7 +127,7 @@ func setupTableServiceAttribute(service string, container string, page *console.
         table.SetSeparator(tview.GraphicsVertBar)
         table.SetSelectable(true, false)
 
-        err = page.AddItem(container, "table_attributes", table, 0, 3, false)
+        err = page.AddItem(container, "table_attributes", table, 0, 1, false)
         if err != nil {
             return err
         }
@@ -203,6 +217,95 @@ func setupTableServiceAttribute(service string, container string, page *console.
         switch event.Key() {
         case tcell.KeyEsc:
             t, _ := page.GetElemTable("table_services")
+            data.App.SetFocus(t)
+            return nil
+         case tcell.KeyTab:
+            table, _ := page.GetElemTable("table_containers")
+            data.App.SetFocus(table)
+            return nil
+
+        }
+        return event
+    })
+
+    return nil
+}
+
+// setupTableServiceContainers create a table for containers' information deployed
+// related to the service and handles key events for navigation
+func setupTableServiceContainers(service string, container string, page *console.Page) error {
+    var table *tview.Table
+
+    data, _ := page.GetData().(*types.PageClusterData)
+
+    table, err := page.GetElemTable("table_containers")
+    if err != nil {
+        // Set column Clusters
+        table = tview.NewTable()
+        table.SetBorders(false)
+        table.SetBorder(true).SetBorderPadding(0, 0, 0, 0).SetTitle("Containers")
+        table.SetSeparator(tview.GraphicsVertBar)
+        table.SetSelectable(true, false)
+
+        err = page.AddItem(container, "table_containers", table, 0, 1, false)
+        if err != nil {
+            return err
+        }
+    }
+
+    // Clear & rebuild attribute table
+    table.Clear()
+    table.SetCell(0, 0, &tview.TableCell{Text: "ID", Align: tview.AlignCenter, Color: tcell.ColorYellow, NotSelectable: true}).
+          //SetCell(0, 1, &tview.TableCell{Text: "Name", Align: tview.AlignCenter, Color: tcell.ColorYellow, NotSelectable: true}).
+          SetCell(0, 1, &tview.TableCell{Text: "Node", Align: tview.AlignCenter, Color: tcell.ColorYellow, NotSelectable: true}).
+          SetCell(0, 2, &tview.TableCell{Text: "Desired", Align: tview.AlignCenter, Color: tcell.ColorYellow, NotSelectable: true}).
+          SetCell(0, 3, &tview.TableCell{Text: "Current", Align: tview.AlignCenter, Color: tcell.ColorYellow, NotSelectable: true}).
+          SetCell(0, 4, &tview.TableCell{Text: "Created", Align: tview.AlignCenter, Color: tcell.ColorYellow, NotSelectable: true}).
+          SetCell(0, 5, &tview.TableCell{Text: "Updated", Align: tview.AlignCenter, Color: tcell.ColorYellow, NotSelectable: true})
+
+    // Get swarm networks
+    swarmTasks, err = GetSwarmTasks(data.Module.Client.(*docker.Client))
+    if err != nil {
+        return err
+    }
+
+    // Find sevrice id corresponding to name
+    srv, err := FindSwarmServiceByName(service, swarmServices)
+    if err != nil {
+        return err
+    }
+
+    // List all tasks / containers related to service
+    serviceTasks := FindSwarmTasksByServiceID(srv.ID, swarmTasks)
+
+    // Get list of nodes
+    swarmNodes, err := GetSwarmNodes(data.Module.Client.(*docker.Client))
+    if err != nil {
+        return err
+    }
+
+    for i, task := range serviceTasks {
+        table.SetCell(i+1, 0, &tview.TableCell{Text: task.ID, Align: tview.AlignLeft, Color: tcell.ColorWhite, MaxWidth: 30 })
+        //table.SetCell(i+1, 1, &tview.TableCell{Text: task.Annotations.Name, Align: tview.AlignLeft, Color: tcell.ColorWhite, MaxWidth: 30 })
+
+        node, err := FindSwarmNodeByID(task.NodeID, swarmNodes)
+        if err != nil {
+            table.SetCell(i+1, 1, &tview.TableCell{Text: "", Align: tview.AlignLeft, Color: tcell.ColorWhite, MaxWidth: 30 })
+        } else {
+            table.SetCell(i+1, 1, &tview.TableCell{Text: node.Description.Hostname, Align: tview.AlignLeft, Color: tcell.ColorWhite, MaxWidth: 30 })
+        }
+        table.SetCell(i+1, 2, &tview.TableCell{Text: string(task.DesiredState), Align: tview.AlignLeft, Color: tcell.ColorWhite, MaxWidth: 30 })
+        table.SetCell(i+1, 3, &tview.TableCell{Text: string(task.Status.State), Align: tview.AlignLeft, Color: tcell.ColorWhite, MaxWidth: 30 })
+        table.SetCell(i+1, 4, &tview.TableCell{Text: task.Meta.CreatedAt.UTC().Format(time.UnixDate), Align: tview.AlignLeft, Color: tcell.ColorWhite, MaxWidth: 30 })
+        table.SetCell(i+1, 5, &tview.TableCell{Text: task.Meta.UpdatedAt.UTC().Format(time.UnixDate), Align: tview.AlignLeft, Color: tcell.ColorWhite, MaxWidth: 30 })
+    }
+
+    // Handle other event key than Enter
+    table.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
+        //fmt.Println("Key pressed")
+        switch event.Key() {
+        case tcell.KeyEsc:
+            t, _ := page.GetElemTable("table_attributes")
             data.App.SetFocus(t)
             return nil
          //case tcell.KeyTab:
