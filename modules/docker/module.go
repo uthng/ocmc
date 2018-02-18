@@ -41,6 +41,11 @@ func NewModuleDocker() *types.Module {
                 Name: "services",
                 Layout: setupLayoutService,
             },
+            "nodes": types.Menu {
+                Name: "nodes",
+                Layout: setupLayoutNode,
+            },
+
         },
     }
 

@@ -6,6 +6,7 @@ import (
     "strings"
     "strconv"
     "time"
+    "sort"
 
     "github.com/rivo/tview"
     "github.com/gdamore/tcell"
@@ -283,6 +284,9 @@ func setupTableServiceContainers(service string, container string, page *console
     if err != nil {
         return err
     }
+
+    // Sort the slice following creation date
+    sort.Slice(serviceTasks, func(i, j int) bool { return serviceTasks[i].Meta.CreatedAt.After(serviceTasks[j].Meta.CreatedAt)})
 
     for i, task := range serviceTasks {
         table.SetCell(i+1, 0, &tview.TableCell{Text: task.ID, Align: tview.AlignLeft, Color: tcell.ColorWhite, MaxWidth: 30 })
