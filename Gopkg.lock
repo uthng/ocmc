@@ -195,9 +195,10 @@
   name = "github.com/uthng/common"
   packages = [
     "docker",
-    "ssh"
+    "ssh",
+    "utils"
   ]
-  revision = "520e371a28ff260cffc6b1c722c7d35eb019e68f"
+  revision = "5166aa2d025722862ad2051eb39ab983375077c8"
 
 [[projects]]
   branch = "master"
@@ -255,6 +256,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "d6e987cf69bfee623911012ae5efad604a0c759f4d1ce58862612e4d63536f1a"
+  inputs-digest = "14b9bda12f3e0295023ea5ae6f9bc6b3ac54f77240feff075334a435884b925e"
   solver-name = "gps-cdcl"
   solver-version = 1

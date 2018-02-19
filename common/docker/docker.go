@@ -3,19 +3,46 @@ package docker
 import (
     //"fmt"
     "errors"
+    "strconv"
 
     "golang.org/x/net/context"
     "github.com/moby/moby/client"
     "github.com/docker/docker/api/types"
     "github.com/docker/docker/api/types/swarm"
 
+    ocmc_types "github.com/uthng/ocmc/types"
+    "github.com/uthng/common/ssh"
+    "github.com/uthng/common/docker"
 )
+
 var (
     ErrNetworkIDNotFound = errors.New("Network ID not found")
     ErrServiceIDNotFound = errors.New("Service ID not found")
     ErrServiceNameNotFound = errors.New("Service Name not found")
     ErrNodeIDNotFound = errors.New("Node ID not found")
 )
+
+// NewDockerClient initializes a docker client to remote cluster
+// following authentication configuration
+func NewDockerClient(config ocmc_types.ClusterConfig) (interface{}, error) {
+    var client interface{}
+    //var err error
+
+    if config.AuthType == "ssh" {
+        if config.Auth.Type == "key" {
+            sshConfig, err := ssh.NewClientConfigWithKeyFile(config.Auth.Username, config.Auth.SshKey, "", false)
+            if err != nil {
+                return nil, err
+            }
+
+            client, err = docker.NewSSHClient(config.Host + ":" + strconv.Itoa(config.Port), "/var/run/docker.sock", "1.30", sshConfig)
+            if err != nil {
+                return nil, err
+            }
+        }
+    }
+    return client, nil
+}
 
 // GetSwarmServices returns a list of swarm services created in the cluster
 func GetSwarmServices (client *client.Client) ([]swarm.Service, error) {
@@ -98,4 +125,11 @@ func FindSwarmNodeByID (id string, nodes []swarm.Node) (*swarm.Node, error) {
 
     return nil, ErrNodeIDNotFound
 }
+
+// GetContainers return a list of containers running on 
+// the current host of the cluster (like docker ps)
+func GetContainers (client *client.Client) ([]types.Container, error) {
+    return client.ContainerList(context.Background(), types.ContainerListOptions{})
+}
+
 

@@ -28,6 +28,7 @@ var swarmNodes          []swarm.Node
 var swarmNetworks       []docker_types.NetworkResource
 var lastSelectedMenu    string
 var orderedMenus        []string
+var nodeClients         []types.NodeClient
 
 // NewModuleDocker initializes a new module for swarm cluster.
 //

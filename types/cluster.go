@@ -9,6 +9,7 @@ import (
 type ClusterConfig struct {
     Name        string
     Host        string
+    Port        int
     Type        string
     AuthType    string
     Auth        ClusterAuth

@@ -15,11 +15,10 @@ import (
     //"github.com/docker/docker/api/types/filters"
     //"github.com/docker/docker/api/types/swarm"
 
-    "github.com/uthng/common/ssh"
-    "github.com/uthng/common/docker"
-
     "github.com/uthng/ocmc/console"
     "github.com/uthng/ocmc/types"
+    "github.com/uthng/ocmc/common/config"
+    "github.com/uthng/ocmc/common/docker"
     module_docker "github.com/uthng/ocmc/modules/docker"
 )
 
@@ -70,10 +69,10 @@ func NewPageCluster(data *types.PageClusterData) (*console.Page, error) {
         return nil, err
     }
 
-    clusterConfig := getClusterConfig(data.PageName, data)
+    clusterConfig := config.GetClusterConfig(data.PageName, data)
     if clusterConfig.Type == "docker" {
         data.Module = module_docker.NewModuleDocker()
-        data.Module.Client, err = initSwarmClient(clusterConfig)
+        data.Module.Client, err = docker.NewDockerClient(clusterConfig)
         if err != nil {
             fmt.Println(err)
             return nil, err
@@ -193,7 +192,7 @@ func createListCluster(page *console.Page) *tview.List {
 
 func createListMenu(page *console.Page) *tview.List {
     data := page.GetData().(*types.PageClusterData)
-    clusterConfig := getClusterConfig(data.PageName, data)
+    clusterConfig := config.GetClusterConfig(data.PageName, data)
 
     // Set column Clusters
     list := tview.NewList().ShowSecondaryText(false)
@@ -250,7 +249,7 @@ func createListMenu(page *console.Page) *tview.List {
 
 func createTableService(page *console.Page) *tview.Table {
     //data := page.GetData().(*PageClusterData)
-    //clusterConfig := getClusterConfig(data.PageName, data)
+    //clusterConfig := config.GetClusterConfig(data.PageName, data)
 
     // Set column Clusters
     table := tview.NewTable()
@@ -264,60 +263,3 @@ func createTableService(page *console.Page) *tview.Table {
 
     return table
 }
-
-
-//func initClusterClient(page *console.Page) error {
-    //var client interface{}
-    //var err error
-
-    //data := page.GetData().(*types.PageClusterData)
-    //config := getClusterConfig(data.PageName, data)
-
-    //if config.Type == "docker" {
-        //client, err = initSwarmClient(config)
-        //if err != nil {
-            //fmt.Println(err)
-            //return err
-        //}
-    //}
-
-    //data.Module.Client = client
-
-    //return nil
-//}
-
-// initDockerClient initializes a docker client to remote cluster
-// following authentication configuration
-func initSwarmClient(config types.ClusterConfig) (interface{}, error) {
-    var client interface{}
-    //var err error
-
-    if config.AuthType == "ssh" {
-        if config.Auth.Type == "key" {
-            sshConfig, err := ssh.NewClientConfigWithKey(config.Auth.Username, config.Auth.SshKey, "", false)
-            if err != nil {
-                fmt.Println(err)
-                return nil, err
-            }
-
-            client, err = docker.NewSSHClient(config.Host, "/var/run/docker.sock", "1.30", sshConfig)
-            if err != nil {
-                fmt.Println(err)
-                return nil, err
-            }
-        }
-    }
-    return client, nil
-}
-
-func getClusterConfig(name string, data *types.PageClusterData) types.ClusterConfig {
-    for _, c := range data.Configs {
-        if c.Name == name {
-            return c
-        }
-    }
-
-    return types.ClusterConfig{}
-}
-
-

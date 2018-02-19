@@ -12,13 +12,13 @@ import (
     "github.com/gdamore/tcell"
 
     //"golang.org/x/net/context"
-    docker "github.com/moby/moby/client"
+    "github.com/moby/moby/client"
     //docker_types "github.com/docker/docker/api/types"
     //"github.com/docker/docker/api/types/swarm"
 
     "github.com/uthng/ocmc/types"
     "github.com/uthng/ocmc/console"
-    //"github.com/uthng/ocmc/pages"
+    "github.com/uthng/ocmc/common/docker"
 )
 
 // setupLayoutService initializes zone containing different elements of
@@ -105,7 +105,7 @@ func setupTableService(container string, page *console.Page) error {
     tableService.SetCell(0, 0, &tview.TableCell{Text: "Name", Align: tview.AlignCenter, Color: tcell.ColorYellow, NotSelectable: true})
 
     // Get swarm services
-    swarmServices, err = GetSwarmServices(data.Module.Client.(*docker.Client))
+    swarmServices, err = docker.GetSwarmServices(data.Module.Client.(*client.Client))
     if err != nil {
         return err
     }
@@ -178,7 +178,7 @@ func setupTableServiceAttributes(service string, container string, page *console
     SetCell(0, 1, &tview.TableCell{Text: "Value", Align: tview.AlignCenter, Color: tcell.ColorYellow, NotSelectable: true})
 
     // Get swarm networks
-    swarmNetworks, err = GetNetworks(data.Module.Client.(*docker.Client))
+    swarmNetworks, err = docker.GetNetworks(data.Module.Client.(*client.Client))
     if err != nil {
         return err
     }
@@ -214,7 +214,7 @@ func setupTableServiceAttributes(service string, container string, page *console
 
             // Get virtual ip with network
             for i, vip := range srv.Endpoint.VirtualIPs {
-                network, err := FindNetworkByID(vip.NetworkID, swarmNetworks)
+                network, err := docker.FindNetworkByID(vip.NetworkID, swarmNetworks)
                 if err != nil {
                     attributes["VIP" + strconv.Itoa(i) + " - Network"] = err.Error()
                 } else {
@@ -303,22 +303,22 @@ func setupTableServiceContainers(service string, container string, page *console
           SetCell(0, 5, &tview.TableCell{Text: "Updated", Align: tview.AlignCenter, Color: tcell.ColorYellow, NotSelectable: true})
 
     // Get swarm networks
-    swarmTasks, err = GetSwarmTasks(data.Module.Client.(*docker.Client))
+    swarmTasks, err = docker.GetSwarmTasks(data.Module.Client.(*client.Client))
     if err != nil {
         return err
     }
 
     // Find sevrice id corresponding to name
-    srv, err := FindSwarmServiceByName(service, swarmServices)
+    srv, err := docker.FindSwarmServiceByName(service, swarmServices)
     if err != nil {
         return err
     }
 
     // List all tasks / containers related to service
-    serviceTasks := FindSwarmTasksByServiceID(srv.ID, swarmTasks)
+    serviceTasks := docker.FindSwarmTasksByServiceID(srv.ID, swarmTasks)
 
     // Get list of nodes
-    swarmNodes, err := GetSwarmNodes(data.Module.Client.(*docker.Client))
+    swarmNodes, err := docker.GetSwarmNodes(data.Module.Client.(*client.Client))
     if err != nil {
         return err
     }
@@ -330,7 +330,7 @@ func setupTableServiceContainers(service string, container string, page *console
         table.SetCell(i+1, 0, &tview.TableCell{Text: task.ID, Align: tview.AlignLeft, Color: tcell.ColorWhite, MaxWidth: 30 })
         //table.SetCell(i+1, 1, &tview.TableCell{Text: task.Annotations.Name, Align: tview.AlignLeft, Color: tcell.ColorWhite, MaxWidth: 30 })
 
-        node, err := FindSwarmNodeByID(task.NodeID, swarmNodes)
+        node, err := docker.FindSwarmNodeByID(task.NodeID, swarmNodes)
         if err != nil {
             table.SetCell(i+1, 1, &tview.TableCell{Text: "", Align: tview.AlignLeft, Color: tcell.ColorWhite, MaxWidth: 30 })
         } else {

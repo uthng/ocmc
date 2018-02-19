@@ -18,14 +18,13 @@ import (
     //"fmt"
 
     "github.com/spf13/cobra"
-    "github.com/spf13/viper"
 
     "github.com/gdamore/tcell"
-    "github.com/mitchellh/mapstructure"
 
     "github.com/uthng/ocmc/console"
     "github.com/uthng/ocmc/pages"
-    "github.com/uthng/ocmc/types"
+    //"github.com/uthng/ocmc/types"
+    "github.com/uthng/ocmc/common/config"
 
 )
 
@@ -69,7 +68,7 @@ func initApp() {
     app.GetPages().AddPage("home", pageHome, true, true)
 
     // Build 1st page cluster
-    data := GetClusterConfig()
+    data := config.ReadClusterConfigFromFile()
     data.App = app
     data.PageName = data.Configs[0].Name
     if len(data.Configs) > 0 {
@@ -85,24 +84,6 @@ func initApp() {
     if err := app.SetFocus(app.GetPages()).Run(); err != nil {
         panic("Error running application")
     }
-}
-
-func GetClusterConfig() *types.PageClusterData {
-    data := &types.PageClusterData{}
-
-    configClusters := viper.Get("clusters").([]interface{})
-    for _, cluster := range configClusters {
-        m := make(map[string]interface{})
-        for k, v := range cluster.(map[interface{}]interface{}) {
-            m[k.(string)] = v
-        }
-        config := types.ClusterConfig{}
-        mapstructure.Decode(m, &config)
-        data.Configs = append(data.Configs, config)
-    }
-
-    //fmt.Printf("%v\n", data.Configs)
-    return data
 }
 
 func handlerKeyEvent(event *tcell.EventKey) *tcell.EventKey {
