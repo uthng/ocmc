@@ -17,12 +17,16 @@ type CmdResult struct {
 type CmdFunc func(map[string]interface{}) *CmdResult
 
 type LayoutFunc func(container  string, page *console.Page) error
+type CloseFunc func(container  string, page *console.Page)
+type FocusFunc func(page *console.Page)
 
 type Menu struct {
     Name        string
 
     Cmd         CmdFunc
     Layout      LayoutFunc
+    Close       CloseFunc
+    Focus       FocusFunc
 }
 
 // Struct for a command of a given module

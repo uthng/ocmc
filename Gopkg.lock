@@ -149,7 +149,7 @@
   branch = "master"
   name = "github.com/rivo/tview"
   packages = ["."]
-  revision = "2a83b20ce34a14727de12b06cace6cc818cc8946"
+  revision = "f6602e7eb19c471c4d7d715f3bb6a967ebad8b76"
 
 [[projects]]
   name = "github.com/spf13/afero"
@@ -255,6 +255,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "45f1a3f1aadb88a7b7493cb34f9c548ede6f5ecebaf4c324045d5d95418045ca"
+  inputs-digest = "d6e987cf69bfee623911012ae5efad604a0c759f4d1ce58862612e4d63536f1a"
   solver-name = "gps-cdcl"
   solver-version = 1

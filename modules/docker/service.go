@@ -1,7 +1,7 @@
 package docker
 
 import (
-    //"fmt"
+    "fmt"
     //"errors"
     "strings"
     "strconv"
@@ -24,12 +24,50 @@ import (
 // setupLayoutService initializes zone containing different elements of
 // service
 func setupLayoutService(container string, page *console.Page) error {
+    // Set default direction for the current menu
+    page.SetContainerDirection(container, tview.FlexColumn)
+
     err := setupTableService(container, page)
     if err != nil {
         return err
     }
 
     return nil
+}
+
+func clearLayoutService(container string, page *console.Page) {
+    //data, _ := page.GetData().(*yytypes.PageClusterData)
+    err := page.RemoveItem("display_details", "table_attributes")
+    if err != nil {
+        fmt.Println(err)
+    }
+
+    err = page.RemoveItem("display_details", "table_tasks")
+    if err != nil {
+        fmt.Println(err)
+    }
+
+    err = page.RemoveContainer("details", "display_details")
+    if err != nil {
+        fmt.Println(err)
+    }
+
+    err = page.RemoveItem("details", "table_services")
+    if err != nil {
+        fmt.Println(err)
+    }
+
+}
+
+// setFocusNode set focus  manually on the first element of detail zone
+func setFocusService(page *console.Page) {
+    data, _ := page.GetData().(*types.PageClusterData)
+
+    // Check if table already exists. If not, create it. Otherwise reuse it
+    tableService, err := page.GetElemTable("table_services")
+    if err == nil {
+        data.App.SetFocus(tableService)
+    }
 }
 
 // setupTableService initializes a table contaning services and
@@ -221,7 +259,7 @@ func setupTableServiceAttributes(service string, container string, page *console
             data.App.SetFocus(t)
             return nil
          case tcell.KeyTab:
-            table, _ := page.GetElemTable("table_containers")
+            table, _ := page.GetElemTable("table_tasks")
             data.App.SetFocus(table)
             return nil
 
@@ -239,16 +277,16 @@ func setupTableServiceContainers(service string, container string, page *console
 
     data, _ := page.GetData().(*types.PageClusterData)
 
-    table, err := page.GetElemTable("table_containers")
+    table, err := page.GetElemTable("table_tasks")
     if err != nil {
         // Set column Clusters
         table = tview.NewTable()
         table.SetBorders(false)
-        table.SetBorder(true).SetBorderPadding(0, 0, 0, 0).SetTitle("Containers")
+        table.SetBorder(true).SetBorderPadding(0, 0, 0, 0).SetTitle("Tasks")
         table.SetSeparator(tview.GraphicsVertBar)
         table.SetSelectable(true, false)
 
-        err = page.AddItem(container, "table_containers", table, 0, 1, false)
+        err = page.AddItem(container, "table_tasks", table, 0, 1, false)
         if err != nil {
             return err
         }

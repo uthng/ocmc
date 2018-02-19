@@ -56,6 +56,23 @@ func (p *Page) AddContainer(parent string, name string, direction int, size int,
     return nil
 }
 
+func (p *Page) RemoveContainer(parent string, name string) error {
+    parentFlex, ok := p.containers[parent]
+    if ok == false {
+        return ErrContainerNotFound
+    }
+
+    flex, ok := p.containers[name]
+    if ok == false {
+        return ErrContainerNotFound
+    }
+
+    parentFlex.RemoveItem(flex)
+    delete(p.containers, name)
+
+    return nil
+}
+
 func (p *Page) AddItem(container string, name string, item interface{}, size int, proportion int, focus bool) error {
     var primitive tview.Primitive
 
@@ -106,6 +123,57 @@ func (p *Page) AddItem(container string, name string, item interface{}, size int
 
     return nil
 }
+
+func (p *Page) RemoveItem(container string, name string) error {
+    var primitive tview.Primitive
+
+    flex, ok := p.containers[container]
+    if ok == false {
+        return ErrContainerNotFound
+    }
+
+    item, ok := p.elems[name]
+    if ok == false {
+        return ErrElemNotFound
+    }
+
+    switch item.(type) {
+    case *tview.Box:
+        primitive = item.(*tview.Box)
+    case *tview.Button:
+        primitive = item.(*tview.Button)
+    case *tview.Checkbox:
+        primitive = item.(*tview.Checkbox)
+    case *tview.DropDown:
+        primitive = item.(*tview.DropDown)
+    case *tview.Flex:
+        primitive = item.(*tview.Flex)
+    case *tview.Form:
+        primitive = item.(*tview.Form)
+    case *tview.Frame:
+        primitive = item.(*tview.Frame)
+    case *tview.InputField:
+        primitive = item.(*tview.InputField)
+    case *tview.List:
+        primitive = item.(*tview.List)
+    case *tview.Modal:
+        primitive = item.(*tview.Modal)
+    case *tview.Pages:
+        primitive = item.(*tview.Pages)
+    case *tview.Table:
+        primitive = item.(*tview.Table)
+    case *tview.TextView:
+        primitive = item.(*tview.TextView)
+    default:
+        return ErrElemIncorrectType
+    }
+
+    flex.RemoveItem(primitive)
+    delete(p.elems, name)
+
+    return nil
+}
+
 
 func (p *Page) GetContainer(name string) (*tview.Flex, error) {
     container, ok := p.containers[name]

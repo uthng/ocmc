@@ -2,7 +2,7 @@ package docker
 
 import (
     //"fmt"
-    //"errors"
+    "errors"
     //"strings"
     //"strconv"
     //"time"
@@ -15,9 +15,10 @@ import (
     docker_types "github.com/docker/docker/api/types"
     "github.com/docker/docker/api/types/swarm"
 
+    "github.com/uthng/common/utils"
+
     "github.com/uthng/ocmc/types"
     "github.com/uthng/ocmc/console"
-    //"github.com/uthng/ocmc/pages"
 )
 
 /////////////// DECLARATION OF GLOBAL VARIABLES ///////////////////
@@ -25,6 +26,8 @@ var swarmServices       []swarm.Service
 var swarmTasks          []swarm.Task
 var swarmNodes          []swarm.Node
 var swarmNetworks       []docker_types.NetworkResource
+var lastSelectedMenu    string
+var orderedMenus        []string
 
 // NewModuleDocker initializes a new module for swarm cluster.
 //
@@ -40,10 +43,14 @@ func NewModuleDocker() *types.Module {
             "services": types.Menu {
                 Name: "services",
                 Layout: setupLayoutService,
+                Close: clearLayoutService,
+                Focus: setFocusService,
             },
             "nodes": types.Menu {
                 Name: "nodes",
                 Layout: setupLayoutNode,
+                Close: clearLayoutNode,
+                Focus: setFocusNode,
             },
 
         },
@@ -53,6 +60,16 @@ func NewModuleDocker() *types.Module {
 }
 
 func setupLayoutModule(container string, page *console.Page) error {
+    // Setup layout for the 1st elem of menu list
+    // Because tview.List does not provide a function to get current selected item
+    // so we force to menu "services"
+    data, _ := page.GetData().(*types.PageClusterData)
+
+    orderedMenus = utils.GetMapSortedKeys(data.Module.Menus, false).([]string)
+    if orderedMenus == nil {
+        return errors.New("Cannot sort menu keys")
+    }
+
     listMenu := setupListMenu(page)
 
     err := page.AddItem("cluster", "list_menu", listMenu, 0, 1, false)
@@ -66,11 +83,9 @@ func setupLayoutModule(container string, page *console.Page) error {
         return err
     }
 
-    // Setup layout for the 1st elem of menu list
-    // Because tview.List does not provide a function to get current selected item
-    // so we force to menu "services"
-    data, _ := page.GetData().(*types.PageClusterData)
-    data.Module.Menus["services"].Layout("details", page)
+    // Show details of 1st menu
+    data.Module.Menus[orderedMenus[0]].Layout("details", page)
+    lastSelectedMenu = orderedMenus[0]
 
     //details, _ := page.GetContainer("details")
     //details.SetBorder(true)
@@ -90,13 +105,20 @@ func setupListMenu(page *console.Page) *tview.List {
     list := tview.NewList().ShowSecondaryText(false)
     list.SetBorder(true).SetTitle("Menu")
 
-    for _, menu := range data.Module.Menus {
-        list.AddItem(menu.Name, "", 0, nil)
+    // Only forcing menu display in order that we want
+    for _, item := range orderedMenus {
+        list.AddItem(item, "", 0, nil)
     }
 
     // When clicking on an item
     list.SetSelectedFunc(func(i int, menuName string, t string, s rune) {
+        if lastSelectedMenu != "" {
+            if data.Module.Menus[lastSelectedMenu].Close != nil {
+                data.Module.Menus[lastSelectedMenu].Close("details", page)
+            }
+        }
         data.Module.Menus[menuName].Layout("details", page)
+        lastSelectedMenu = menuName
         //if menuName == "services" {
             //client := data.Client.(*client.Client)
             //services, err := client.ServiceList(context.Background(), types.ServiceListOptions{})
@@ -129,8 +151,7 @@ func setupListMenu(page *console.Page) *tview.List {
             data.App.SetFocus(list)
             return nil
          case tcell.KeyTab:
-            table, _ := page.GetElemTable("table_services")
-            data.App.SetFocus(table)
+            data.Module.Menus[lastSelectedMenu].Focus(page)
             return nil
 
         }
