@@ -7,14 +7,6 @@ import (
     "github.com/rivo/tview"
     "github.com/gdamore/tcell"
 
-    //"golang.org/x/net/context"
-
-    // docker
-    //"github.com/moby/moby/client"
-    //"github.com/docker/docker/api/types"
-    //"github.com/docker/docker/api/types/filters"
-    //"github.com/docker/docker/api/types/swarm"
-
     "github.com/uthng/ocmc/console"
     "github.com/uthng/ocmc/types"
     "github.com/uthng/ocmc/common/config"
@@ -84,42 +76,6 @@ func NewPageCluster(data *types.PageClusterData) (*console.Page, error) {
 
     }
 
-    // Setup menu for project
-    //listMenu := createListMenu(page)
-
-    //err = page.AddItem("cluster", "list_menu", listMenu, 0, 1, false)
-    //if err != nil {
-        //return nil, err
-    //}
-
-    // Setup zone showing project details
-    //details := tview.NewBox()
-    //details.SetBorder(true).SetTitle("Details")
-
-    //err = page.AddItem("cluster", "details", details, 0, 5, false)
-    //if err != nil {
-        //return nil, err
-    //}
-
-    // Add container for cluster
-    //err = page.AddContainer("cluster", "details", tview.FlexColumn, 0, 10, false)
-    //if err != nil {
-        //return nil, err
-    //}
-
-    //tableService := createTableService(page)
-    //err = page.AddItem("details", "table_services", tableService, 0, 1, false)
-    //if err != nil {
-        //return nil, err
-    //}
-
-
-    // Init cluster client
-    //err = initClusterClient(page)
-    //if err != nil {
-        //return nil, err
-    //}
-
     return page, nil
 }
 
@@ -188,78 +144,4 @@ func createListCluster(page *console.Page) *tview.List {
     })
 
     return list
-}
-
-func createListMenu(page *console.Page) *tview.List {
-    data := page.GetData().(*types.PageClusterData)
-    clusterConfig := config.GetClusterConfig(data.PageName, data)
-
-    // Set column Clusters
-    list := tview.NewList().ShowSecondaryText(false)
-    list.SetBorder(true).SetTitle("Menu")
-    //clusters.SetBackgroundColor(tcell.ColorDarkViolet)
-
-    // Populate list content
-    if clusterConfig.Type == "swarm" {
-        // TODO: Must be filled up from menu registry of module swarm or k8s
-        list.AddItem("services", "", 0, nil)
-        list.AddItem("networks", "", 0, nil)
-        list.AddItem("nodes", "", 0, nil)
-    }
-
-    // When clicking on an item
-    list.SetSelectedFunc(func(i int, menuName string, t string, s rune) {
-        if menuName == "services" {
-            //client := data.Client.(*client.Client)
-            //services, err := client.ServiceList(context.Background(), types.ServiceListOptions{})
-            //if err != nil {
-                //fmt.Println(err)
-            //}
-
-            //table, err := page.GetElemTable("table_services")
-            //for i, service := range services {
-                ////fmt.Println(i)
-                //image := strings.Split(service.Spec.TaskTemplate.ContainerSpec.Image, "@")[0]
-                //table.SetCell(i+1, 0, &tview.TableCell{Text: service.ID, Align: tview.AlignCenter, Color: tcell.ColorYellow, MaxWidth: 20 }).
-                      //SetCell(i+1, 1, &tview.TableCell{Text: service.Spec.Annotations.Name, Align: tview.AlignCenter, Color: tcell.ColorYellow}).
-
-                      ////SetCell(i+1, 2, &tview.TableCell{Text: service.Spec.Mode.Replicated.Replicas, Align: tview.AlignCenter, Color: tcell.ColorYellow}).
-                      //SetCell(i+1, 2, &tview.TableCell{Text: "replicas", Align: tview.AlignCenter, Color: tcell.ColorYellow}).
-                      //SetCell(i+1, 3, &tview.TableCell{Text: image, Align: tview.AlignLeft, Color: tcell.ColorYellow, MaxWidth: 50})
-                ////fmt.Println(service.Spec.Annotations.Name)
-            //}
-            //table.Clear()
-        }
-    })
-
-    // Modify certain key events before forwarding others to default handler
-    list.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
-        //fmt.Println("Key pressed")
-        switch event.Key() {
-        case tcell.KeyTab:
-            list, _ := page.GetElemList("list_clusters")
-            data.App.SetFocus(list)
-            return nil
-        }
-        return event
-    })
-
-    return list
-}
-
-func createTableService(page *console.Page) *tview.Table {
-    //data := page.GetData().(*PageClusterData)
-    //clusterConfig := config.GetClusterConfig(data.PageName, data)
-
-    // Set column Clusters
-    table := tview.NewTable()
-    table.SetBorders(true).SetTitle("Services")
-
-    table.SetCell(0, 0, &tview.TableCell{Text: "ID", Align: tview.AlignCenter, Color: tcell.ColorYellow}).
-          SetCell(0, 1, &tview.TableCell{Text: "Name", Align: tview.AlignCenter, Color: tcell.ColorYellow}).
-          SetCell(0, 2, &tview.TableCell{Text: "Mode", Align: tview.AlignCenter, Color: tcell.ColorYellow}).
-          SetCell(0, 3, &tview.TableCell{Text: "Replicas", Align: tview.AlignCenter, Color: tcell.ColorYellow}).
-          SetCell(0, 4, &tview.TableCell{Text: "Image", Align: tview.AlignCenter, Color: tcell.ColorYellow})
-
-    return table
 }
