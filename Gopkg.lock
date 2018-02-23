@@ -8,35 +8,37 @@
   version = "v0.4.7"
 
 [[projects]]
+  branch = "master"
   name = "github.com/docker/distribution"
   packages = [
-    "digest",
+    "digestset",
     "reference"
   ]
-  revision = "48294d928ced5dd9b378f7fd7c6f5da3ff3f2c89"
-  version = "v2.6.2"
+  revision = "6664ec703991875e14419ff4960921cce7678bab"
 
 [[projects]]
+  branch = "master"
   name = "github.com/docker/docker"
   packages = [
+    "api",
     "api/types",
     "api/types/blkiodev",
     "api/types/container",
     "api/types/events",
     "api/types/filters",
+    "api/types/image",
     "api/types/mount",
     "api/types/network",
-    "api/types/reference",
     "api/types/registry",
     "api/types/strslice",
     "api/types/swarm",
+    "api/types/swarm/runtime",
     "api/types/time",
     "api/types/versions",
     "api/types/volume",
-    "pkg/tlsconfig"
+    "client"
   ]
-  revision = "092cba3727bb9b4a2f0e922cd6c0f93ea270e363"
-  version = "v1.13.1"
+  revision = "f0f41bae5f0f2579784dfa551643b85286d8c899"
 
 [[projects]]
   name = "github.com/docker/go-connections"
@@ -76,6 +78,12 @@
   version = "v1.0.0"
 
 [[projects]]
+  name = "github.com/gogo/protobuf"
+  packages = ["proto"]
+  revision = "1adfc126b41513cc696b209667c8656ea7aac67c"
+  version = "v1.0.0"
+
+[[projects]]
   branch = "master"
   name = "github.com/hashicorp/hcl"
   packages = [
@@ -106,8 +114,8 @@
 [[projects]]
   name = "github.com/magiconair/properties"
   packages = ["."]
-  revision = "d419a98cdbed11a922bf76f257b7c4be79b50e73"
-  version = "v1.7.4"
+  revision = "c3beff4c2358b44d0493c7dda585e7db7ff28ae6"
+  version = "v1.7.6"
 
 [[projects]]
   name = "github.com/mattn/go-runewidth"
@@ -125,13 +133,22 @@
   branch = "master"
   name = "github.com/mitchellh/mapstructure"
   packages = ["."]
-  revision = "a4e142e9c047c904fa2f1e144d9a84e6133024bc"
+  revision = "00c29f56e2386353d58c599509e8dc3801b0d716"
 
 [[projects]]
-  name = "github.com/moby/moby"
-  packages = ["client"]
-  revision = "092cba3727bb9b4a2f0e922cd6c0f93ea270e363"
-  version = "v1.13.1"
+  name = "github.com/opencontainers/go-digest"
+  packages = ["."]
+  revision = "279bed98673dd5bef374d3b6e4b09e2af76183bf"
+  version = "v1.0.0-rc1"
+
+[[projects]]
+  name = "github.com/opencontainers/image-spec"
+  packages = [
+    "specs-go",
+    "specs-go/v1"
+  ]
+  revision = "d60099175f88c47cd379c4738d158884749ed235"
+  version = "v1.0.1"
 
 [[projects]]
   name = "github.com/pelletier/go-toml"
@@ -146,10 +163,11 @@
   version = "v0.8.0"
 
 [[projects]]
-  branch = "master"
+  branch = "flex_removeitem"
   name = "github.com/rivo/tview"
   packages = ["."]
-  revision = "f6602e7eb19c471c4d7d715f3bb6a967ebad8b76"
+  revision = "7659d38181ad0e44828ad71ac4ab984593a7c9b0"
+  source = "github.com/uthng/tview"
 
 [[projects]]
   name = "github.com/spf13/afero"
@@ -163,8 +181,8 @@
 [[projects]]
   name = "github.com/spf13/cast"
   packages = ["."]
-  revision = "acbeb36b902d72a7a4c18e8f3241075e7ab763e4"
-  version = "v1.1.0"
+  revision = "8965335b8c7107321228e3e3702cab9832751bac"
+  version = "v1.2.0"
 
 [[projects]]
   name = "github.com/spf13/cobra"
@@ -198,7 +216,7 @@
     "ssh",
     "utils"
   ]
-  revision = "5166aa2d025722862ad2051eb39ab983375077c8"
+  revision = "978d3d918b8086bd76137255ba381bc14cd7736e"
 
 [[projects]]
   branch = "master"
@@ -211,7 +229,7 @@
     "poly1305",
     "ssh"
   ]
-  revision = "9de5f2eaf759b4c4550b3db39fed2e9e5f86f45c"
+  revision = "432090b8f568c018896cd8a0fb0345872bbac6ce"
 
 [[projects]]
   branch = "master"
@@ -221,7 +239,7 @@
     "context/ctxhttp",
     "proxy"
   ]
-  revision = "f5dfe339be1d06f81b22525fe34671ee7d2c8904"
+  revision = "cbe0f9307d0156177f9dd5dc85da1a31abc5f2fb"
 
 [[projects]]
   branch = "master"
@@ -233,7 +251,6 @@
   revision = "37707fdb30a5b38865cfb95e5aab41707daec7fd"
 
 [[projects]]
-  branch = "master"
   name = "golang.org/x/text"
   packages = [
     "encoding",
@@ -245,7 +262,8 @@
     "unicode/cldr",
     "unicode/norm"
   ]
-  revision = "e19ae1496984b1c655b8044a65c0300a3c878dd3"
+  revision = "f21a4dfb5e38f5895301dc265a8def02365cc3d0"
+  version = "v0.3.0"
 
 [[projects]]
   branch = "v2"
@@ -256,6 +274,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "14b9bda12f3e0295023ea5ae6f9bc6b3ac54f77240feff075334a435884b925e"
+  inputs-digest = "26e8bbee87777a533e5d55c8a686005ae973157b3e1e91917df08c795b68b30b"
   solver-name = "gps-cdcl"
   solver-version = 1

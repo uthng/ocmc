@@ -1,6 +1,6 @@
 # Gopkg.toml example
 #
-# Refer to https://github.com/golang/dep/blob/master/docs/Gopkg.toml.md
+# Refer to https://golang.github.io/dep/docs/Gopkg.toml.html
 # for detailed Gopkg.toml documentation.
 #
 # required = ["github.com/user/thing/cmd/thing"]
@@ -26,12 +26,29 @@
 
 
 [[constraint]]
+  name = "github.com/docker/docker"
+  branch = "master"
+
+[[override]]
+  name = "github.com/docker/distribution"
+  branch = "master"
+
+[[constraint]]
+  name = "github.com/gdamore/tcell"
+  version = "1.0.0"
+
+[[constraint]]
   branch = "master"
   name = "github.com/mitchellh/go-homedir"
 
 [[constraint]]
   branch = "master"
+  name = "github.com/mitchellh/mapstructure"
+
+[[constraint]]
+  branch = "flex_removeitem"
   name = "github.com/rivo/tview"
+  source = "github.com/uthng/tview"
 
 [[constraint]]
   name = "github.com/spf13/cobra"
@@ -40,6 +57,14 @@
 [[constraint]]
   name = "github.com/spf13/viper"
   version = "1.0.0"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/uthng/common"
+
+[[constraint]]
+  branch = "master"
+  name = "golang.org/x/net"
 
 [prune]
   go-tests = true
