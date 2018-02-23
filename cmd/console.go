@@ -22,7 +22,8 @@ import (
     "github.com/gdamore/tcell"
 
     "github.com/uthng/ocmc/console"
-    "github.com/uthng/ocmc/pages"
+    "github.com/uthng/ocmc/pages/home"
+    "github.com/uthng/ocmc/pages/cluster"
     //"github.com/uthng/ocmc/types"
     "github.com/uthng/ocmc/common/config"
 
@@ -61,7 +62,7 @@ func initApp() {
     // Set handler to handle key event
     app.SetInputCapture(handlerKeyEvent)
 
-    pageHome, err := pages.NewPageHome("Home")
+    pageHome, err := home.NewPageHome("Home")
     if err != nil {
         panic(err)
     }
@@ -72,7 +73,7 @@ func initApp() {
     data.App = app
     data.PageName = data.Configs[0].Name
     if len(data.Configs) > 0 {
-        pageCluster, err := pages.NewPageCluster(data)
+        pageCluster, err := cluster.NewPageCluster(data)
         if err != nil {
             panic(err)
         }

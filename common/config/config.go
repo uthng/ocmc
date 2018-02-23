@@ -1,6 +1,7 @@
 package config
 
 import (
+    //"fmt"
 
     "github.com/spf13/viper"
 
@@ -11,7 +12,7 @@ import (
 )
 
 // ReadClusterConfigFromFile reads configurations of clusters from
-// configuration file 
+// configuration file
 func ReadClusterConfigFromFile() *types.PageClusterData {
     data := &types.PageClusterData{}
 

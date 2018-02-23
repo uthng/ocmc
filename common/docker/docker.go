@@ -1,12 +1,14 @@
 package docker
 
 import (
-    //"fmt"
+    "fmt"
     "errors"
     "strconv"
+    //"bufio"
+    //"io/ioutil"
 
     "golang.org/x/net/context"
-    "github.com/moby/moby/client"
+    "github.com/docker/docker/client"
     "github.com/docker/docker/api/types"
     "github.com/docker/docker/api/types/swarm"
 
@@ -24,18 +26,17 @@ var (
 
 // NewDockerClient initializes a docker client to remote cluster
 // following authentication configuration
-func NewDockerClient(config ocmc_types.ClusterConfig) (interface{}, error) {
+func NewDockerClient(config ocmc_types.ConnConfig) (interface{}, error) {
     var client interface{}
-    //var err error
 
-    if config.AuthType == "ssh" {
-        if config.Auth.Type == "key" {
-            sshConfig, err := ssh.NewClientConfigWithKeyFile(config.Auth.Username, config.Auth.SshKey, "", false)
+    if config.Auth.Type == "ssh" {
+        if config.Auth.Kind == "key" {
+            sshConfig, err := ssh.NewClientConfigWithKeyFile(config.Auth.Username, config.Auth.SshKey, "", 0, false)
             if err != nil {
                 return nil, err
             }
 
-            client, err = docker.NewSSHClient(config.Host + ":" + strconv.Itoa(config.Port), "/var/run/docker.sock", "1.30", sshConfig)
+            client, err = docker.NewSSHClient(config.Host + ":" + strconv.Itoa(config.Port), "/var/run/docker.sock", "1.35", sshConfig.ClientConfig)
             if err != nil {
                 return nil, err
             }
@@ -132,4 +133,121 @@ func GetContainers (client *client.Client) ([]types.Container, error) {
     return client.ContainerList(context.Background(), types.ContainerListOptions{})
 }
 
+// CreateExec creates an exec instance and return exec id
+//func CreateExec (client *client.Client, id string, cmd []string) (*string, context.Context, error) {
+    //config := types.ExecConfig {
+        ////AttachStdout: true,
+        ////AttachStderr: true,
+        ////Tty: false,
+        ////Detach: false,
+        ////DetachKeys: "ctrl-p,ctrl-q",
+        //Cmd: cmd,
+    //}
+    //// Create a exec instance
+    //ctx := context.Background()
+    //res, err := client.ContainerExecCreate(context.Background(), id, config)
+    //if err != nil {
+        //return nil, ctx, err
+    //}
 
+    //fmt.Println("exec id ", res.ID)
+    //return &res.ID, ctx, nil
+//}
+
+
+// StartExec start exec process and attach it to a reader.
+// It returns a bufio reader for command output
+//
+// This function takes temporairly cmd in argument but
+// need to be removed in the next release of docker
+// because ContainerExecAttach does not take types.ExecConfig anymore
+// Instead, it takes types.ExecStartCheck
+//func StartExec (client *client.Client, ctx context.Context, execId string, cmd []string) (*bufio.Reader, error) {
+    //config := types.ExecConfig {
+        //AttachStdout: true,
+        ////AttachStderr: true,
+        //Tty: false,
+        //Detach: false,
+        ////DetachKeys: "ctrl-p,ctrl-q",
+        ////Cmd: cmd,
+    //}
+
+    //// Create a exec instance
+    ////err := client.ContainerExecStart(ctx, execId, types.ExecStartCheck{Detach: false, Tty: false})
+    ////if err != nil {
+        ////fmt.Println("error start exec")
+        ////return nil, err
+    ////}
+
+    //// Attach an exec
+    //res, err := client.ContainerExecAttach(ctx, execId, config)
+    //if err != nil {
+        //fmt.Println("error attach exec")
+        //return nil, err
+    //}
+    //defer res.Close()
+
+    //line, _, err := res.Reader.ReadLine()
+    //fmt.Println("line ", string(line))
+    //return res.Reader, nil
+//}
+
+func ExecCommand(client *client.Client, cid string, cmd []string) ([]byte, error) {
+    ctx := context.Background()
+
+    id, err := client.ContainerExecCreate(ctx, cid,
+                types.ExecConfig{
+                    //WorkingDir:   "/tmp",
+                    //Env:          strslice.StrSlice([]string{"FOO=BAR"}),
+                    AttachStdout: true,
+                    Cmd: cmd,
+                    //Cmd:          strslice.StrSlice([]string{"sh", "-c", "env"}),
+                })
+    if err != nil {
+        fmt.Println("error create exec ", err)
+        return nil, err
+    }
+
+    fmt.Println("id ", id)
+
+    //insp, err := client.ContainerExecInspect(ctx, id.ID)
+    //if err != nil {
+         //fmt.Println("error inspect exec ", err)
+        //return nil, err
+    //}
+
+    //err = client.ContainerExecStart(ctx, id.ID, types.ExecStartCheck{
+                    //Detach: false,
+                    //Tty:    true,
+                //})
+    //if err != nil {
+         //fmt.Println("error start exec ", err)
+        //return nil, err
+    //}
+
+    //fmt.Println("inspect ", insp)
+    //fmt.Println("cid ", cid)
+    resp, err := client.ContainerExecAttach(ctx, id.ID,
+                types.ExecStartCheck{
+                    Detach: false,
+                    Tty:    false,
+                })
+    if err != nil {
+        fmt.Println("error attach exec ", err)
+        return nil, err
+    }
+    defer resp.Close()
+
+    fmt.Println("response ", resp)
+    line, _, err := resp.Reader.ReadLine()
+    fmt.Println("response ", string(line), err)
+
+
+    //r, err := ioutil.ReadAll(resp.Reader)
+    //if err != nil {
+        //fmt.Println("error readall ", err)
+        //return nil, err
+    //}
+
+    return line, err
+}

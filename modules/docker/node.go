@@ -12,12 +12,13 @@ import (
     "github.com/gdamore/tcell"
 
     //"golang.org/x/net/context"
-    "github.com/moby/moby/client"
+    "github.com/docker/docker/client"
     //docker_types "github.com/docker/docker/api/types"
     //"github.com/docker/docker/api/types/swarm"
 
     "github.com/uthng/ocmc/types"
     "github.com/uthng/ocmc/console"
+    page_console "github.com/uthng/ocmc/pages/console"
     "github.com/uthng/ocmc/common/config"
     "github.com/uthng/ocmc/common/docker"
 )
@@ -140,12 +141,36 @@ func setupTableNodes(container string, page *console.Page) error {
             list, _ := page.GetElemList("list_menu")
             data.App.SetFocus(list)
             return nil
-         case tcell.KeyTab:
+        case tcell.KeyTab:
             table, _ := page.GetElemTable("table_containers")
             data.App.SetFocus(table)
             return nil
+        case tcell.KeyF5:
+            // Get current selected row
+            row, _ := tableNodes.GetSelection()
+            // Get the server ip of the current row
+            host := tableNodes.GetCell(row, 6).Text
+            // Check if a node client is already initialized.
+            // If yes, use it. Otherwise, initialize a new one
+            nodeClient, err := getNodeClient(host, data)
+            if err != nil {
+                return nil
+            }
+            // New data console
+            dataConsole := &types.PageConsoleData{
+                PageName: host,
+                Node: &nodeClient,
+                App: data.App,
+            }
 
+            pageConsole, err := page_console.NewPageConsole(dataConsole)
+            if err != nil {
+                return nil
+            }
+            data.App.GetPages().AddPage(host, pageConsole, true, true)
+            return nil
         }
+
         return event
     })
 
@@ -156,7 +181,6 @@ func setupTableNodes(container string, page *console.Page) error {
 // related to the service and handles key events for navigation
 func setupTableNodeContainers(server string, container string, page *console.Page) error {
     var table *tview.Table
-    var nodeClient types.NodeClient
 
     data, _ := page.GetData().(*types.PageClusterData)
 
@@ -188,27 +212,12 @@ func setupTableNodeContainers(server string, container string, page *console.Pag
 
     // Check if a node client is already initialized.
     // If yes, use it. Otherwise, initialize a new one
-    for _, client := range nodeClients {
-        if client.Host == server {
-            nodeClient = client
-        }
+    nodeClient, err := getNodeClient(server, data)
+    if err != nil {
+        return err
     }
 
-    if nodeClient.Client == nil {
-        // Prepare cluster config
-        clusterConfig := config.GetClusterConfig(data.PageName, data)
-        clusterConfig.Host = server
-
-        // Initialize new node client
-        nodeClient.Host = server
-        nodeClient.Type = "docker"
-        nodeClient.Client, err = docker.NewDockerClient(clusterConfig)
-        if err != nil {
-            return err
-        }
-
-        nodeClients = append(nodeClients, nodeClient)
-    }
+    nodeClients = append(nodeClients, nodeClient)
 
     // Get containers
     containers, err := docker.GetContainers(nodeClient.Client.(*client.Client))
@@ -249,10 +258,40 @@ func setupTableNodeContainers(server string, container string, page *console.Pag
             //table, _ := page.GetElemTable("table_attributes")
             //data.App.SetFocus(table)
             //return nil
-
         }
         return event
     })
 
     return nil
+}
+
+// getNodeClient searchs to see if there is a node client corresponding to
+// the given server in the global variable nodeClients of this module
+// If yes, use it. Otherwise, create a new one
+func getNodeClient(server string, data *types.PageClusterData) (types.NodeClient, error) {
+    client := types.NodeClient{}
+
+    for _, c := range nodeClients {
+        if c.Config.Host == server {
+            client = c
+        }
+    }
+
+    if client.Client == nil {
+        // Prepare config connection
+        connConfig := config.GetClusterConfig(data.PageName, data).Config
+        connConfig.Host = server
+
+        // Initialize new node client
+        c, err := docker.NewDockerClient(connConfig)
+        if err != nil {
+            return client, err
+        }
+
+        // Init new client
+        client.Client = c
+        client.Config = connConfig
+    }
+
+    return client, nil
 }

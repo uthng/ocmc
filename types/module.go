@@ -39,16 +39,3 @@ type Module struct {
     Layout      LayoutFunc
     Menus       map[string]Menu
 }
-
-// Nodeclient contains name and client connection to a node
-// in the cluster
-// This struct can be used to execute a command on a container
-// on the node
-type NodeClient struct {
-    // Server host
-    Host        string
-    // type: docker or kubernetes
-    Type        string
-    // CLient: docker or kubernetes or other stuffs
-    Client      interface{}
-}

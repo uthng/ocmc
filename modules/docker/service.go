@@ -12,7 +12,7 @@ import (
     "github.com/gdamore/tcell"
 
     //"golang.org/x/net/context"
-    "github.com/moby/moby/client"
+    "github.com/docker/docker/client"
     //docker_types "github.com/docker/docker/api/types"
     //"github.com/docker/docker/api/types/swarm"
 

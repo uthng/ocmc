@@ -1,4 +1,4 @@
-package pages
+package cluster
 
 import (
     "fmt"
@@ -61,10 +61,10 @@ func NewPageCluster(data *types.PageClusterData) (*console.Page, error) {
         return nil, err
     }
 
-    clusterConfig := config.GetClusterConfig(data.PageName, data)
-    if clusterConfig.Type == "docker" {
+    connConfig := config.GetClusterConfig(data.PageName, data).Config
+    if connConfig.Type == "docker" {
         data.Module = module_docker.NewModuleDocker()
-        data.Module.Client, err = docker.NewDockerClient(clusterConfig)
+        data.Module.Client, err = docker.NewDockerClient(connConfig)
         if err != nil {
             fmt.Println(err)
             return nil, err

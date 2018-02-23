@@ -7,25 +7,10 @@ import (
 
 
 type ClusterConfig struct {
-    Name        string
-    Host        string
-    Port        int
-    Type        string
-    AuthType    string
-    Auth        ClusterAuth
+    Name                string
+    Config              ConnConfig
 }
 
-type ClusterAuth struct {
-    Type        string
-    Ca          string
-    Client      string
-    ClientKey   string
-
-    SshKey      string
-
-    Username    string
-    Passord     string
-}
 
 type PageClusterData struct {
     PageName            string
@@ -36,4 +21,3 @@ type PageClusterData struct {
 
     App                 *console.App
 }
-
