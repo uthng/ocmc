@@ -7,11 +7,14 @@ import (
     "github.com/rivo/tview"
     "github.com/gdamore/tcell"
 
+    "github.com/uthng/common/k8s"
+
     "github.com/uthng/ocmc/console"
     "github.com/uthng/ocmc/types"
     "github.com/uthng/ocmc/common/config"
     "github.com/uthng/ocmc/common/docker"
     module_docker "github.com/uthng/ocmc/modules/docker"
+    module_k8s "github.com/uthng/ocmc/modules/k8s"
 )
 
 
@@ -65,16 +68,16 @@ func NewPageCluster(data *types.PageClusterData) (*console.Page, error) {
     if connConfig.Type == "docker" {
         data.Module = module_docker.NewModuleDocker()
         data.Module.Client, err = docker.NewDockerClient(connConfig)
-        if err != nil {
-            fmt.Println(err)
-            return nil, err
-        }
-
-        data.Module.Layout("cluster", page)
-        //fmt.Println("data %v\n", data.Module)
-        //fmt.Println("data %v\n", page.GetData().(*types.PageClusterData).Module)
-
+    } else if connConfig.Type == "k8s" {
+        data.Module = module_k8s.NewModuleK8s()
+        data.Module.Client, err = newK8SClient(connConfig)
     }
+    if err != nil {
+        return nil, err
+    }
+
+    data.Module.Layout("cluster", page)
+
 
     return page, nil
 }
@@ -106,20 +109,21 @@ func createListCluster(page *console.Page) *tview.List {
             newData.PageName = clusterName
             newPage, err := NewPageCluster(newData)
             if err != nil {
-                fmt.Errorf("Cannot create new page %s\n", clusterName)
-            }
+                fmt.Println(err)
+            } else {
 
-            // Add new page
-            data.App.GetPages().AddPage(clusterName, newPage, true, true)
-            // Set focus in the new page to corresponding item
-            l, err := newPage.GetElemList("list_clusters")
-            if err != nil {
-                fmt.Errorf("List list_cluster not found")
-            }
+                // Add new page
+                data.App.GetPages().AddPage(clusterName, newPage, true, true)
+                // Set focus in the new page to corresponding item
+                l, err := newPage.GetElemList("list_clusters")
+                if err != nil {
+                    fmt.Println(err)
+                }
 
-            l.SetCurrentItem(i)
-            //data.App.GetPages.SwitchToPage(clusterName)
-            //data.App.SetFocus(newPage)
+                l.SetCurrentItem(i)
+                //data.App.GetPages.SwitchToPage(clusterName)
+                //data.App.SetFocus(newPage)
+            }
         } else {
             // If the page was already created, switch to it then
             data.App.GetPages().SwitchToPage(clusterName)
@@ -144,4 +148,24 @@ func createListCluster(page *console.Page) *tview.List {
     })
 
     return list
+}
+
+// newK8SClient returns a new client kubernetes following different
+// configuration specified by user in the configuration file
+func newK8SClient(config types.ConnConfig) (*k8s.Client, error) {
+    var client *k8s.Client
+    var err error
+
+    if config.Auth.Type == "tls" {
+        if config.Auth.Kind == "file" {
+            config := k8s.NewConfigFromRestTlsFile(config.Host, config.Host, config.Port, "/api/v1", config.Auth.Ca, config.Auth.Client, config.Auth.ClientKey)
+            client, err = k8s.NewClient(config)
+            if err != nil {
+                return nil, err
+            }
+            return client, nil
+        }
+    }
+
+    return client, fmt.Errorf("No config supported")
 }

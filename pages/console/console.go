@@ -93,7 +93,7 @@ func newSSHClient(config types.ConnConfig) error {
             return err
         }
 
-        sshClient = ssh.NewClient(sshConfig)
+        sshClient, err = ssh.NewClient(sshConfig)
         if err != nil {
             return err
         }

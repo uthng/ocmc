@@ -15,7 +15,7 @@
 package cmd
 
 import (
-    //"fmt"
+    "fmt"
 
     "github.com/spf13/cobra"
 
@@ -75,7 +75,7 @@ func initApp() {
     if len(data.Configs) > 0 {
         pageCluster, err := cluster.NewPageCluster(data)
         if err != nil {
-            panic(err)
+            fmt.Println(err)
         }
         app.GetPages().AddPage(data.Configs[0].Name, pageCluster, true, true)
     }
@@ -83,7 +83,7 @@ func initApp() {
     //app.GetPages().SwitchToPage("home")
 
     if err := app.SetFocus(app.GetPages()).Run(); err != nil {
-        panic("Error running application")
+        fmt.Println("Error running application")
     }
 }
 

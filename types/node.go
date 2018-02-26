@@ -20,7 +20,7 @@ type ConnConfig struct {
 type ConnAuth struct {
     // Type: ssh, cert
     Type        string
-    // Kind: key, vault, password
+    // Kind: key (ssh), file (certs), vault, password
     Kind        string
     // Certficates: file path or from vault
     Ca          string
