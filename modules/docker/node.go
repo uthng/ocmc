@@ -38,7 +38,7 @@ func setupLayoutNode(container string, page *console.Page) error {
 }
 
 func clearLayoutNode(container string, page *console.Page) {
-    //data, _ := page.GetData().(*types.PageClusterData)
+    //data, _ := page.Data.(*types.PageClusterData)
     err := page.RemoveItem(container, "table_nodes")
     if err != nil {
         fmt.Println(err)
@@ -53,7 +53,7 @@ func clearLayoutNode(container string, page *console.Page) {
 
 // setFocusNode set focus  manually on the first element of detail zone
 func setFocusNode(page *console.Page) {
-    data, _ := page.GetData().(*types.PageClusterData)
+    data, _ := page.Data.(*types.PageClusterData)
 
     // Check if table already exists. If not, create it. Otherwise reuse it
     table, err := page.GetElemTable("table_nodes")
@@ -68,7 +68,7 @@ func setFocusNode(page *console.Page) {
 func setupTableNodes(container string, page *console.Page) error {
     var tableNodes *tview.Table
 
-    data, _ := page.GetData().(*types.PageClusterData)
+    data, _ := page.Data.(*types.PageClusterData)
 
     // Check if table already exists. If not, create it. Otherwise reuse it
     tableNodes, err := page.GetElemTable("table_nodes")
@@ -182,7 +182,7 @@ func setupTableNodes(container string, page *console.Page) error {
 func setupTableNodeContainers(server string, container string, page *console.Page) error {
     var table *tview.Table
 
-    data, _ := page.GetData().(*types.PageClusterData)
+    data, _ := page.Data.(*types.PageClusterData)
 
     table, err := page.GetElemTable("table_containers")
     if err != nil {

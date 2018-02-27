@@ -42,7 +42,7 @@ O:::::::OOO:::::::O  C:::::CCCCCCCC::::CM::::::M               M::::::M  C:::::C
 )
 
 func NewPageHome(name string) (*console.Page, error) {
-    page := console.NewPage()
+    page := console.NewPage(name)
 
     textView := tview.NewTextView().
                       SetDynamicColors(true).

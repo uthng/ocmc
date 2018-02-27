@@ -18,17 +18,19 @@ var (
 type Page struct {
     *tview.Flex
 
+    Name string
+    Data interface{}
+
     containers map[string]*tview.Flex
     elems map[string]interface{}
-
-    data interface{}
 }
 
-func NewPage() *Page {
+func NewPage(name string) *Page {
     p := &Page {
         Flex: tview.NewFlex(),
     }
 
+    p.Name = name
     p.containers = make(map[string]*tview.Flex)
     p.elems = make(map[string]interface{})
 
@@ -199,14 +201,14 @@ func (p *Page) SetContainerDirection(container string, direction int) error {
     return nil
 }
 
-func (p *Page) SetData(data interface{}) {
-    p.data = data
-}
+//func (p *Page) SetData(data interface{}) {
+    //p.data = data
+//}
 
 
-func (p *Page) GetData() interface{} {
-    return p.data
-}
+//func (p *Page) Data interface{} {
+    //return p.data
+//}
 
 func (p *Page) GetElemBox(name string) (*tview.Box, error) {
     elem, err := getElem(name, p.elems)

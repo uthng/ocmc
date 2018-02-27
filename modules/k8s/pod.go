@@ -34,7 +34,7 @@ func setupLayoutPod(container string, page *console.Page) error {
 }
 
 func clearLayoutPod(container string, page *console.Page) {
-    //data, _ := page.GetData().(*types.PageClusterData)
+    //data, _ := page.Data.(*types.PageClusterData)
     err := page.RemoveItem(container, "table_pods")
     if err != nil {
         fmt.Println(err)
@@ -49,7 +49,7 @@ func clearLayoutPod(container string, page *console.Page) {
 
 // setFocusNode set focus  manually on the first element of detail zone
 func setFocusPod(page *console.Page) {
-    data, _ := page.GetData().(*types.PageClusterData)
+    data, _ := page.Data.(*types.PageClusterData)
 
     // Check if table already exists. If not, create it. Otherwise reuse it
     table, err := page.GetElemTable("table_pods")
@@ -64,7 +64,7 @@ func setFocusPod(page *console.Page) {
 func setupTablePods(container string, page *console.Page) error {
     var table *tview.Table
 
-    data, _ := page.GetData().(*types.PageClusterData)
+    data, _ := page.Data.(*types.PageClusterData)
 
     // Check if table already exists. If not, create it. Otherwise reuse it
     table, err := page.GetElemTable("table_pods")
@@ -172,7 +172,7 @@ func setupTablePods(container string, page *console.Page) error {
 //func setupTableNodeContainers(server string, container string, page *console.Page) error {
     //var table *tview.Table
 
-    //data, _ := page.GetData().(*types.PageClusterData)
+    //data, _ := page.Data.(*types.PageClusterData)
 
     //table, err := page.GetElemTable("table_containers")
     //if err != nil {

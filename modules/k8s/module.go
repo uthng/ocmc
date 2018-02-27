@@ -61,7 +61,7 @@ func setupLayoutModule(container string, page *console.Page) error {
     // Setup layout for the 1st elem of menu list
     // Because tview.List does not provide a function to get current selected item
     // so we force to menu "services"
-    data, _ := page.GetData().(*types.PageClusterData)
+    data, _ := page.Data.(*types.PageClusterData)
 
     orderedMenus = utils.GetMapSortedKeys(data.Module.Menus, false).([]string)
     if orderedMenus == nil {
@@ -99,7 +99,7 @@ func setupLayoutModule(container string, page *console.Page) error {
 // setupListMenu loads a list of available actions and handles
 // all key events
 func setupListMenu(page *console.Page) *tview.List {
-    data, _ := page.GetData().(*types.PageClusterData)
+    data, _ := page.Data.(*types.PageClusterData)
 
     // List menu
     list := tview.NewList().ShowSecondaryText(false)

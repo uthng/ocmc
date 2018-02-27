@@ -36,7 +36,7 @@ func setupLayoutService(container string, page *console.Page) error {
 }
 
 func clearLayoutService(container string, page *console.Page) {
-    //data, _ := page.GetData().(*yytypes.PageClusterData)
+    //data, _ := page.Data.(*yytypes.PageClusterData)
     err := page.RemoveItem("display_details", "table_attributes")
     if err != nil {
         fmt.Println(err)
@@ -61,7 +61,7 @@ func clearLayoutService(container string, page *console.Page) {
 
 // setFocusNode set focus  manually on the first element of detail zone
 func setFocusService(page *console.Page) {
-    data, _ := page.GetData().(*types.PageClusterData)
+    data, _ := page.Data.(*types.PageClusterData)
 
     // Check if table already exists. If not, create it. Otherwise reuse it
     tableService, err := page.GetElemTable("table_services")
@@ -75,7 +75,7 @@ func setFocusService(page *console.Page) {
 func setupTableService(container string, page *console.Page) error {
     var tableService *tview.Table
 
-    data, _ := page.GetData().(*types.PageClusterData)
+    data, _ := page.Data.(*types.PageClusterData)
 
     // Check if table already exists. If not, create it. Otherwise reuse it
     tableService, err := page.GetElemTable("table_services")
@@ -155,7 +155,7 @@ func setupTableServiceAttributes(service string, container string, page *console
     var attributes = make(map[string]string)
     var keyAttributes []string
 
-    data, _ := page.GetData().(*types.PageClusterData)
+    data, _ := page.Data.(*types.PageClusterData)
 
     table, err := page.GetElemTable("table_attributes")
     if err != nil {
@@ -275,7 +275,7 @@ func setupTableServiceAttributes(service string, container string, page *console
 func setupTableServiceContainers(service string, container string, page *console.Page) error {
     var table *tview.Table
 
-    data, _ := page.GetData().(*types.PageClusterData)
+    data, _ := page.Data.(*types.PageClusterData)
 
     table, err := page.GetElemTable("table_tasks")
     if err != nil {

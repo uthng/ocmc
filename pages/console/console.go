@@ -22,10 +22,10 @@ var sshClient           *ssh.Client
 
 // NewPageConsole returns a new page console
 func NewPageConsole(data *types.PageConsoleData) (*console.Page, error) {
-    page := console.NewPage()
+    page := console.NewPage(data.PageName)
 
     // Set page data
-    page.SetData(data)
+    page.Data = data
 
     // Setup Title
     title := tview.NewTextView()
@@ -110,7 +110,7 @@ func setupListContainers(container string, page *console.Page) error {
     var list *tview.List
     var mapContainers = make(map[string]string)
 
-    data := page.GetData().(*types.PageConsoleData)
+    data := page.Data.(*types.PageConsoleData)
 
     // Check if list already exists. If not, create it. Otherwise reuse it
     list, err := page.GetElemList("list_containers")
@@ -204,7 +204,7 @@ func setupContainerConsole(container string, page *console.Page) error {
 func setupInputFieldCommand(container string, page *console.Page) error {
     var inputField *tview.InputField
 
-    data := page.GetData().(*types.PageConsoleData)
+    data := page.Data.(*types.PageConsoleData)
 
     // Check if list already exists. If not, create it. Otherwise reuse it
     inputField, err := page.GetElemInputField("inputfield_command")
@@ -265,7 +265,7 @@ func setupInputFieldCommand(container string, page *console.Page) error {
 func setupTextViewOutput(container string, page *console.Page) error {
     var textView *tview.TextView
 
-    data := page.GetData().(*types.PageConsoleData)
+    data := page.Data.(*types.PageConsoleData)
 
     // Check if list already exists. If not, create it. Otherwise reuse it
     textView, err := page.GetElemTextView("textview_output")

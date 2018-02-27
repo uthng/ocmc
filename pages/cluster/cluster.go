@@ -19,10 +19,10 @@ import (
 
 
 func NewPageCluster(data *types.PageClusterData) (*console.Page, error) {
-    page := console.NewPage()
+    page := console.NewPage(data.PageName)
 
     // Set page data
-    page.SetData(data)
+    page.Data = data
 
     // Setup Title
     title := tview.NewTextView()
@@ -85,7 +85,7 @@ func NewPageCluster(data *types.PageClusterData) (*console.Page, error) {
 
 ///////////// PRIVATE FUNCTIONS ///////////////////
 func createListCluster(page *console.Page) *tview.List {
-    data := page.GetData().(*types.PageClusterData)
+    data := page.Data.(*types.PageClusterData)
 
     // Set column Clusters
     list := tview.NewList().ShowSecondaryText(false)
