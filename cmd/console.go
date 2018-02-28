@@ -66,7 +66,7 @@ func initApp() {
     if err != nil {
         panic(err)
     }
-    app.GetPages().AddPage("home", pageHome, true, true)
+    app.GetPages().AddPage("Home", pageHome, true, true)
 
     // Build 1st page cluster
     data := config.ReadClusterConfigFromFile()
@@ -80,7 +80,7 @@ func initApp() {
         app.GetPages().AddPage(data.Configs[0].Name, pageCluster, true, true)
     }
 
-    //app.GetPages().SwitchToPage("home")
+    app.GetPages().SwitchToPage("Home")
 
     if err := app.SetFocus(app.GetPages()).Run(); err != nil {
         fmt.Println("Error running application")
@@ -89,25 +89,10 @@ func initApp() {
 
 func handlerKeyEvent(event *tcell.EventKey) *tcell.EventKey {
     switch event.Key() {
-    case tcell.KeyEscape:
-        // Go back to Finder.
-        //pageProject := console.NewProjectPage()
-        //pageProject.Initialize("TOTO")
-        //app.pages.AddPage("Project", pageProject, true, true)
-
-        //app.pages.SwitchToPage("Project")
-        //pages.SwitchToPage(finderPage)
-        //if finderFocus != nil {
-            //app.SetFocus(finderFocus)
-        //}
-    //case tcell.KeyEnter:
-        //// Load the next batch of rows.
-        //loadRows(table.GetRowCount() - 1)
-        //table.ScrollToEnd()
-        //app.toolbar.SetBorder(true)
-    //}
-    //case tcell.KeyPgUp:
-    //case tcell.KeyPgDn:
+    case tcell.KeyPgUp:
+        app.GetPages().SwitchToPrevPage()
+    case tcell.KeyPgDn:
+        app.GetPages().SwitchToNextPage()
     case tcell.KeyF2:
         //app.GetPages().SwitchToPage("cluster")
         //page, _ := app.GetPages().GetPage("TVL PPD FR")

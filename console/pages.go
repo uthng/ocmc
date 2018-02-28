@@ -13,14 +13,17 @@ var (
     ErrPageNotFound = errors.New("Page not found")
 )
 
+// Page is a embedded type of tview.Page with 2 more fields:
+// the current selected page and a page list
 type Pages struct {
     *tview.Pages
-
+    // Current selected page
     CurrentPage         string
-    //pages               map[string]*Page
+    // page list
     pages               *list.List
 }
 
+// NewPages returns a new Pages
 func NewPages() *Pages {
     p := &Pages {
         Pages: tview.NewPages(),
@@ -32,6 +35,7 @@ func NewPages() *Pages {
     return p
 }
 
+// AddPage adds a new page to tview.Pages and page list
 func (p *Pages) AddPage(name string, page *Page, resize bool, visible bool) {
     p.Pages.AddPage(name, page, resize, visible)
 
@@ -40,16 +44,13 @@ func (p *Pages) AddPage(name string, page *Page, resize bool, visible bool) {
     p.CurrentPage = name
 }
 
+// GetPage returns the page corresponding to the given name
+// if the page is in tview.Pages slice and page list
 func (p *Pages) GetPage(name string) (*Page, error) {
     err := p.Pages.HasPage(name)
     if err == false {
         return nil, ErrPageNotFound
     }
-
-    //page, ok := p.pages[name]
-    //if ok == false || err == false {
-        //return nil, ErrPageNotFound
-    //}
 
     // Iterate through list and print its contents.
     for e := p.pages.Front(); e != nil; e = e.Next() {
@@ -62,6 +63,8 @@ func (p *Pages) GetPage(name string) (*Page, error) {
     return nil, ErrPageNotFound
 }
 
+// RemovePage deletes the page corresponding to the given name
+// if it exists
 func (p *Pages) RemovePage(name string) {
     p.Pages.RemovePage(name)
 
@@ -85,6 +88,7 @@ func (p *Pages) RemovePage(name string) {
     }
 }
 
+// SwitchToNextPage switchs to the next page of the current page
 func (p *Pages) SwitchToNextPage() {
     for e := p.pages.Front(); e != nil; e = e.Next() {
         page := e.Value.(*Page)
@@ -98,6 +102,7 @@ func (p *Pages) SwitchToNextPage() {
     }
 }
 
+// SwitchToPrevPage switchs to the prev page of the current page
 func (p *Pages) SwitchToPrevPage() {
     for e := p.pages.Front(); e != nil; e = e.Next() {
         page := e.Value.(*Page)
@@ -107,6 +112,17 @@ func (p *Pages) SwitchToPrevPage() {
                 p.Pages.SwitchToPage(p.CurrentPage)
                 return
             }
+        }
+    }
+}
+
+// SwitchToPage switchs to the page corresponding to the given name
+func (p *Pages) SwitchToPage(name string) {
+    for e := p.pages.Front(); e != nil; e = e.Next() {
+        page := e.Value.(*Page)
+        if page.Name == name {
+            p.CurrentPage = name
+            p.Pages.SwitchToPage(p.CurrentPage)
         }
     }
 }

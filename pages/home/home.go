@@ -52,7 +52,7 @@ func NewPageHome(name string) (*console.Page, error) {
     textView.SetBorder(true)
     textView.SetTextAlign(tview.AlignCenter).SetTextColor(tcell.ColorDarkViolet)
 
-    err := page.AddItem("root", "logo", textView, 0, 1, false)
+    err := page.AddItem("root", "logo", textView, 0, 1, true)
     if err != nil {
         return nil, err
     }

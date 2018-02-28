@@ -49,9 +49,6 @@ func NewPageCluster(data *types.PageClusterData) (*console.Page, error) {
 
     // Set column Clusters
     listClusters := createListCluster(page)
-    //listClusters := tview.NewList().ShowSecondaryText(false)
-    //listClusters.SetBorder(true).SetTitle("Clusters")
-    //clusters.SetBackgroundColor(tcell.ColorDarkViolet)
 
     err = page.AddItem("main", "list_clusters", listClusters, 0, 1, true)
     if err != nil {
@@ -77,7 +74,6 @@ func NewPageCluster(data *types.PageClusterData) (*console.Page, error) {
     }
 
     data.Module.Layout("cluster", page)
-
 
     return page, nil
 }
@@ -111,7 +107,6 @@ func createListCluster(page *console.Page) *tview.List {
             if err != nil {
                 fmt.Println(err)
             } else {
-
                 // Add new page
                 data.App.GetPages().AddPage(clusterName, newPage, true, true)
                 // Set focus in the new page to corresponding item
@@ -137,11 +132,24 @@ func createListCluster(page *console.Page) *tview.List {
 
     // Modify certain key events before forwarding others to default handler
     list.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
-        //fmt.Println("Key pressed")
         switch event.Key() {
         case tcell.KeyTab:
             list, _ := page.GetElemList("list_menu")
             data.App.SetFocus(list)
+            return nil
+        case tcell.KeyPgUp, tcell.KeyPgDn:
+            // Loop list of configs to find out the index of the current page
+            // because it is the same for list_clusters
+            for i, conf := range data.Configs {
+                if conf.Name == data.App.GetPages().CurrentPage {
+                    // Get the page corresponding to the current page
+                    p, _ := data.App.GetPages().GetPage(data.App.GetPages().CurrentPage)
+                    // Get list cluster of current page
+                    l, _ := p.GetElemList("list_clusters")
+                    // Set the item corresponding to the current page
+                    l.SetCurrentItem(i)
+                }
+            }
             return nil
         }
         return event
