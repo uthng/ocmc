@@ -145,7 +145,7 @@ func setupTableNodes(container string, page *console.Page) error {
             table, _ := page.GetElemTable("table_containers")
             data.App.SetFocus(table)
             return nil
-        case tcell.KeyF5:
+        case tcell.KeyCtrlT:
             // Get current selected row
             row, _ := tableNodes.GetSelection()
             // Get the server ip of the current row
