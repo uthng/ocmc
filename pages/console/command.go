@@ -5,10 +5,9 @@ import (
     "strings"
     //"fmt"
 
-    "github.com/docker/docker/client"
+    //"github.com/uthng/common/docker"
 
     "github.com/uthng/ocmc/types"
-    "github.com/uthng/ocmc/common/docker"
     //"github.com/uthng/common/ssh"
 
 )
@@ -60,7 +59,7 @@ func execCommand(cid, cmd string, data *types.PageConsoleData) ([]byte, error) {
 //      - client: docker client (not ssh client)
 //
 // It returns a bufio.Reader for command output
-func execDockerCommand (exec *CmdExec, client *client.Client) ([]byte, error) {
+//func execDockerCommand (exec *CmdExec, client *docker.Client) ([]byte, error) {
     // Create a exec instance
     //execId, ctx, err := docker.CreateExec(client, exec.ContainerId, strings.Split(exec.Command, " "))
     //if  err != nil {
@@ -78,6 +77,6 @@ func execDockerCommand (exec *CmdExec, client *client.Client) ([]byte, error) {
     //// Append this command to executed command list
     //executedCommands = append(executedCommands, exec)
 
-    res, err := docker.ExecCommand(client, exec.ContainerId, strings.Split(exec.Command, " "))
-    return res, err
-}
+    //res, err := client.ExecCommand(client, exec.ContainerId, strings.Split(exec.Command, " "))
+    //return res, err
+//}

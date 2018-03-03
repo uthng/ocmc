@@ -91,14 +91,14 @@ func setupTablePods(container string, page *console.Page) error {
     table.SetCell(0, 4, &tview.TableCell{Text: "Age", Align: tview.AlignCenter, Color: tcell.ColorYellow, NotSelectable: true})
     table.SetCell(0, 5, &tview.TableCell{Text: "Node", Align: tview.AlignCenter, Color: tcell.ColorYellow, NotSelectable: true})
 
-    // Get swarm nodes
+    // Get k8s pods
     client := data.Module.Client.(*k8s.Client)
     pods, err := client.GetPodList("")
     if err != nil {
         return err
     }
 
-    // Build service table
+    // Build pod table
     for i, pod := range pods.Items {
         table.SetCell(i+1, 0, &tview.TableCell{Text: pod.ObjectMeta.Namespace, Align: tview.AlignLeft, Color: tcell.ColorWhite, MaxWidth: 100 })
         table.SetCell(i+1, 1, &tview.TableCell{Text: pod.ObjectMeta.Name, Align: tview.AlignLeft, Color: tcell.ColorWhite, MaxWidth: 100 })

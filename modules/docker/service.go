@@ -12,7 +12,7 @@ import (
     "github.com/gdamore/tcell"
 
     //"golang.org/x/net/context"
-    "github.com/docker/docker/client"
+    //"github.com/docker/docker/client"
     //docker_types "github.com/docker/docker/api/types"
     //"github.com/docker/docker/api/types/swarm"
 
@@ -105,7 +105,8 @@ func setupTableService(container string, page *console.Page) error {
     tableService.SetCell(0, 0, &tview.TableCell{Text: "Name", Align: tview.AlignCenter, Color: tcell.ColorYellow, NotSelectable: true})
 
     // Get swarm services
-    swarmServices, err = docker.GetSwarmServices(data.Module.Client.(*client.Client))
+    client := data.Module.Client.(*docker.Client)
+    swarmServices, err = client.GetSwarmServices(ctx, nil)
     if err != nil {
         return err
     }
@@ -178,7 +179,8 @@ func setupTableServiceAttributes(service string, container string, page *console
     SetCell(0, 1, &tview.TableCell{Text: "Value", Align: tview.AlignCenter, Color: tcell.ColorYellow, NotSelectable: true})
 
     // Get swarm networks
-    swarmNetworks, err = docker.GetNetworks(data.Module.Client.(*client.Client))
+    client := data.Module.Client.(*docker.Client)
+    swarmNetworks, err = client.GetNetworks(ctx, nil)
     if err != nil {
         return err
     }
@@ -214,7 +216,7 @@ func setupTableServiceAttributes(service string, container string, page *console
 
             // Get virtual ip with network
             for i, vip := range srv.Endpoint.VirtualIPs {
-                network, err := docker.FindNetworkByID(vip.NetworkID, swarmNetworks)
+                network, err := client.FindNetworkByID(vip.NetworkID, swarmNetworks)
                 if err != nil {
                     attributes["VIP" + strconv.Itoa(i) + " - Network"] = err.Error()
                 } else {
@@ -303,22 +305,23 @@ func setupTableServiceContainers(service string, container string, page *console
           SetCell(0, 5, &tview.TableCell{Text: "Updated", Align: tview.AlignCenter, Color: tcell.ColorYellow, NotSelectable: true})
 
     // Get swarm networks
-    swarmTasks, err = docker.GetSwarmTasks(data.Module.Client.(*client.Client))
+    client := data.Module.Client.(*docker.Client)
+    swarmTasks, err = client.GetSwarmTasks(ctx, nil)
     if err != nil {
         return err
     }
 
     // Find sevrice id corresponding to name
-    srv, err := docker.FindSwarmServiceByName(service, swarmServices)
+    srv, err := client.FindSwarmServiceByName(service, swarmServices)
     if err != nil {
         return err
     }
 
     // List all tasks / containers related to service
-    serviceTasks := docker.FindSwarmTasksByServiceID(srv.ID, swarmTasks)
+    serviceTasks := client.FindSwarmTasksByServiceID(srv.ID, swarmTasks)
 
     // Get list of nodes
-    swarmNodes, err := docker.GetSwarmNodes(data.Module.Client.(*client.Client))
+    swarmNodes, err := client.GetSwarmNodes(ctx, nil)
     if err != nil {
         return err
     }

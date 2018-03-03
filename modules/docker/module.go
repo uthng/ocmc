@@ -10,12 +10,13 @@ import (
     "github.com/rivo/tview"
     "github.com/gdamore/tcell"
 
-    //"golang.org/x/net/context"
+    "golang.org/x/net/context"
     //docker "github.com/moby/moby/client"
     docker_types "github.com/docker/docker/api/types"
     "github.com/docker/docker/api/types/swarm"
 
     "github.com/uthng/common/utils"
+    "github.com/uthng/common/docker"
 
     "github.com/uthng/ocmc/types"
     "github.com/uthng/ocmc/console"
@@ -30,10 +31,12 @@ var lastSelectedMenu    string
 var orderedMenus        []string
 var nodeClients         []types.NodeClient
 
+var ctx = context.Background()
+
 // NewModuleDocker initializes a new module for swarm cluster.
 //
 // It defines functions to setup layout and menu for modules
-func NewModuleDocker() *types.Module {
+func NewModuleDocker(config types.ConnConfig) (*types.Module, error) {
     module := &types.Module {
         Name: "docker",
         Version: "0.1",
@@ -57,7 +60,33 @@ func NewModuleDocker() *types.Module {
         },
     }
 
-    return module
+    module.Client, err = newDockerClient(config)
+    if err != nil {
+        return nil, errors.New("Cannot initialize docker client")
+    }
+
+    return module, nil
+}
+
+// NewDockerClient initializes a docker client to remote cluster
+// following authentication configuration
+func NewDockerClient(config ocmc_types.ConnConfig) (interface{}, error) {
+    var client interface{}
+
+    if config.Auth.Type == "ssh" {
+        if config.Auth.Kind == "key" {
+            sshConfig, err := ssh.NewClientConfigWithKeyFile(config.Auth.Username, config.Auth.SshKey, "", 0, false)
+            if err != nil {
+                return nil, err
+            }
+
+            client, err = docker.NewSSHClient(config.Host + ":" + strconv.Itoa(config.Port), "/var/run/docker.sock", "1.35", sshConfig.ClientConfig)
+            if err != nil {
+                return nil, err
+            }
+        }
+    }
+    return client, nil
 }
 
 func setupLayoutModule(container string, page *console.Page) error {

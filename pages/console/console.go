@@ -8,17 +8,19 @@ import (
     "github.com/rivo/tview"
     "github.com/gdamore/tcell"
 
-    "github.com/docker/docker/client"
+    "golang.org/x/net/context"
 
     "github.com/uthng/common/ssh"
+    "github.com/uthng/common/docker"
 
     "github.com/uthng/ocmc/console"
     "github.com/uthng/ocmc/types"
-    "github.com/uthng/ocmc/common/docker"
 )
 
 var selectedContainerId string
 var sshClient           *ssh.Client
+
+var ctx = context.Background()
 
 // NewPageConsole returns a new page console
 func NewPageConsole(data *types.PageConsoleData) (*console.Page, error) {
@@ -129,7 +131,8 @@ func setupListContainers(container string, page *console.Page) error {
     // Check if the node client is docker
     if data.Node.Config.Type == "docker" {
         // Get containers
-        containers, err := docker.GetContainers(data.Node.Client.(*client.Client))
+        client := data.Module.Client.(*docker.Client)
+        containers, err := client.GetContainers(ctx, nil)
         if err != nil {
             return err
         }

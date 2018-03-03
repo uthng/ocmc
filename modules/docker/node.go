@@ -11,16 +11,12 @@ import (
     "github.com/rivo/tview"
     "github.com/gdamore/tcell"
 
-    //"golang.org/x/net/context"
-    "github.com/docker/docker/client"
-    //docker_types "github.com/docker/docker/api/types"
-    //"github.com/docker/docker/api/types/swarm"
+    "github.com/uthng/common/docker"
 
     "github.com/uthng/ocmc/types"
     "github.com/uthng/ocmc/console"
     page_console "github.com/uthng/ocmc/pages/console"
     "github.com/uthng/ocmc/common/config"
-    "github.com/uthng/ocmc/common/docker"
 )
 
 // setupLayoutNodes initializes zone containing different elements of
@@ -97,7 +93,8 @@ func setupTableNodes(container string, page *console.Page) error {
     tableNodes.SetCell(0, 6, &tview.TableCell{Text: "Address", Align: tview.AlignCenter, Color: tcell.ColorYellow, NotSelectable: true})
 
     // Get swarm nodes
-    swarmNodes, err = docker.GetSwarmNodes(data.Module.Client.(*client.Client))
+    client := data.Module.Client.(*docker.Client)
+    swarmNodes, err = client.GetSwarmNodes(ctx, nil)
     if err != nil {
         fmt.Println(err)
         return err
@@ -220,7 +217,8 @@ func setupTableNodeContainers(server string, container string, page *console.Pag
     nodeClients = append(nodeClients, nodeClient)
 
     // Get containers
-    containers, err := docker.GetContainers(nodeClient.Client.(*client.Client))
+    client := data.Module.Client.(*docker.Client)
+    containers, err := client.GetContainers(ctx, nil)
     if err != nil {
         return err
     }
@@ -283,7 +281,7 @@ func getNodeClient(server string, data *types.PageClusterData) (types.NodeClient
         connConfig.Host = server
 
         // Initialize new node client
-        c, err := docker.NewDockerClient(connConfig)
+        c, err := newDockerClient(connConfig)
         if err != nil {
             return client, err
         }

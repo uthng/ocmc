@@ -11,6 +11,7 @@ import (
     "github.com/gdamore/tcell"
 
     "github.com/uthng/common/utils"
+    "github.com/uthng/common/k8s"
 
     "github.com/uthng/ocmc/types"
     "github.com/uthng/ocmc/console"
@@ -28,7 +29,7 @@ var orderedMenus        []string
 // NewModuleDocker initializes a new module for swarm cluster.
 //
 // It defines functions to setup layout and menu for modules
-func NewModuleK8s() *types.Module {
+func NewModuleK8s(config types.ConnConfig) *types.Module {
     module := &types.Module {
         Name: "k8s",
         Version: "0.1",
@@ -52,7 +53,32 @@ func NewModuleK8s() *types.Module {
         },
     }
 
+    module.Client, err = newK8SClient(config)
+    if err != nil {
+        return nil, errors.New("Cannot initialize k8s client")
+    }
+
     return module
+}
+
+// newK8SClient returns a new client kubernetes following different
+// configuration specified by user in the configuration file
+func newK8SClient(config types.ConnConfig) (*k8s.Client, error) {
+    var client *k8s.Client
+    var err error
+
+    if config.Auth.Type == "tls" {
+        if config.Auth.Kind == "file" {
+            config := k8s.NewConfigFromRestTlsFile(config.Host, config.Host, config.Port, "/api/v1", config.Auth.Ca, config.Auth.Client, config.Auth.ClientKey)
+            client, err = k8s.NewClient(config)
+            if err != nil {
+                return nil, err
+            }
+            return client, nil
+        }
+    }
+
+    return client, fmt.Errorf("No config supported")
 }
 
 // setupLayoutModule sets the layout for the module with a menu list for actions
