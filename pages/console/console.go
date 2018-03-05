@@ -12,6 +12,7 @@ import (
 
     "github.com/uthng/common/ssh"
     "github.com/uthng/common/docker"
+    "github.com/uthng/common/clipboard"
 
     "github.com/uthng/ocmc/console"
     "github.com/uthng/ocmc/types"
@@ -19,6 +20,7 @@ import (
 
 var selectedContainerId string
 var sshClient           *ssh.Client
+var copypaste           clipboard.ClipBoard
 
 var ctx = context.Background()
 
@@ -82,6 +84,12 @@ func NewPageConsole(data *types.PageConsoleData) (*console.Page, error) {
     // Point to 1st element of container list
     list, _ := page.GetElemList("list_containers")
     list.SetCurrentItem(0)
+
+    // Initialize clipboard
+    copypaste, err = clipboard.NewClipBoard("xclip")
+    if err != nil {
+        fmt.Println(err)
+    }
 
     return page, nil
 }
@@ -244,17 +252,29 @@ func setupInputFieldCommand(container string, page *console.Page) error {
 
     // Modify certain key events before forwarding others to default handler
     inputField.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
-        //fmt.Println("Key pressed")
-        switch event.Key() {
-        case tcell.KeyEsc:
+        //fmt.Println("Key pressed", event.Name())
+        switch event.Name() {
+        case "Esc":
             list, _ := page.GetElemList("list_containers")
             data.App.SetFocus(list)
             return nil
-         case tcell.KeyTab:
+        case "Tab":
             textView, _ := page.GetElemTextView("textview_output")
             data.App.SetFocus(textView)
             return nil
-
+        case "Alt+Rune[c]":
+            text := inputField.GetText()
+            err := copypaste.Copy([]byte(text))
+            if err != nil {
+                fmt.Println(err)
+            }
+            return nil
+        case "Alt+Rune[v]":
+            text, err := copypaste.Paste()
+            if err == nil {
+                inputField.SetText(string(text))
+            }
+            return nil
         }
         return event
     })
