@@ -29,7 +29,9 @@ var orderedMenus        []string
 // NewModuleDocker initializes a new module for swarm cluster.
 //
 // It defines functions to setup layout and menu for modules
-func NewModuleK8s(config types.ConnConfig) *types.Module {
+func NewModuleK8s(config types.ConnConfig) (*types.Module, error) {
+    var err error
+
     module := &types.Module {
         Name: "k8s",
         Version: "0.1",
@@ -58,7 +60,7 @@ func NewModuleK8s(config types.ConnConfig) *types.Module {
         return nil, errors.New("Cannot initialize k8s client")
     }
 
-    return module
+    return module, nil
 }
 
 // newK8SClient returns a new client kubernetes following different
@@ -78,7 +80,7 @@ func newK8SClient(config types.ConnConfig) (*k8s.Client, error) {
         }
     }
 
-    return client, fmt.Errorf("No config supported")
+    return client, errors.New("No config supported")
 }
 
 // setupLayoutModule sets the layout for the module with a menu list for actions

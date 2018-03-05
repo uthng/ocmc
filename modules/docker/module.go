@@ -4,7 +4,7 @@ import (
     //"fmt"
     "errors"
     //"strings"
-    //"strconv"
+    "strconv"
     //"time"
 
     "github.com/rivo/tview"
@@ -17,6 +17,7 @@ import (
 
     "github.com/uthng/common/utils"
     "github.com/uthng/common/docker"
+    "github.com/uthng/common/ssh"
 
     "github.com/uthng/ocmc/types"
     "github.com/uthng/ocmc/console"
@@ -37,6 +38,8 @@ var ctx = context.Background()
 //
 // It defines functions to setup layout and menu for modules
 func NewModuleDocker(config types.ConnConfig) (*types.Module, error) {
+    var err error
+
     module := &types.Module {
         Name: "docker",
         Version: "0.1",
@@ -68,9 +71,9 @@ func NewModuleDocker(config types.ConnConfig) (*types.Module, error) {
     return module, nil
 }
 
-// NewDockerClient initializes a docker client to remote cluster
+// newDockerClient initializes a docker client to remote cluster
 // following authentication configuration
-func NewDockerClient(config ocmc_types.ConnConfig) (interface{}, error) {
+func newDockerClient(config types.ConnConfig) (interface{}, error) {
     var client interface{}
 
     if config.Auth.Type == "ssh" {

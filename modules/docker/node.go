@@ -217,7 +217,7 @@ func setupTableNodeContainers(server string, container string, page *console.Pag
     nodeClients = append(nodeClients, nodeClient)
 
     // Get containers
-    client := data.Module.Client.(*docker.Client)
+    client := nodeClient.Client.(*docker.Client)
     containers, err := client.GetContainers(ctx, nil)
     if err != nil {
         return err

@@ -131,7 +131,7 @@ func setupListContainers(container string, page *console.Page) error {
     // Check if the node client is docker
     if data.Node.Config.Type == "docker" {
         // Get containers
-        client := data.Module.Client.(*docker.Client)
+        client := data.Node.Client.(*docker.Client)
         containers, err := client.GetContainers(ctx, nil)
         if err != nil {
             return err

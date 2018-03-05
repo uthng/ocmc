@@ -11,14 +11,10 @@ import (
     "github.com/rivo/tview"
     "github.com/gdamore/tcell"
 
-    //"golang.org/x/net/context"
-    //"github.com/docker/docker/client"
-    //docker_types "github.com/docker/docker/api/types"
-    //"github.com/docker/docker/api/types/swarm"
+    "github.com/uthng/common/docker"
 
     "github.com/uthng/ocmc/types"
     "github.com/uthng/ocmc/console"
-    "github.com/uthng/ocmc/common/docker"
 )
 
 // setupLayoutService initializes zone containing different elements of
@@ -333,7 +329,7 @@ func setupTableServiceContainers(service string, container string, page *console
         table.SetCell(i+1, 0, &tview.TableCell{Text: task.ID, Align: tview.AlignLeft, Color: tcell.ColorWhite, MaxWidth: 30 })
         //table.SetCell(i+1, 1, &tview.TableCell{Text: task.Annotations.Name, Align: tview.AlignLeft, Color: tcell.ColorWhite, MaxWidth: 30 })
 
-        node, err := docker.FindSwarmNodeByID(task.NodeID, swarmNodes)
+        node, err := client.FindSwarmNodeByID(task.NodeID, swarmNodes)
         if err != nil {
             table.SetCell(i+1, 1, &tview.TableCell{Text: "", Align: tview.AlignLeft, Color: tcell.ColorWhite, MaxWidth: 30 })
         } else {
