@@ -133,11 +133,13 @@ func setupTableService(container string, page *console.Page) error {
             list, _ := page.GetElemList("list_menu")
             data.App.SetFocus(list)
             return nil
-         case tcell.KeyTab:
+        case tcell.KeyTab:
             table, _ := page.GetElemTable("table_attributes")
             data.App.SetFocus(table)
             return nil
-
+        case tcell.KeyF5:
+            setupTableService(container, page)
+            return nil
         }
         return event
     })
@@ -256,9 +258,12 @@ func setupTableServiceAttributes(service string, container string, page *console
             t, _ := page.GetElemTable("table_services")
             data.App.SetFocus(t)
             return nil
-         case tcell.KeyTab:
+        case tcell.KeyTab:
             table, _ := page.GetElemTable("table_tasks")
             data.App.SetFocus(table)
+            return nil
+        case tcell.KeyF5:
+            setupTableServiceAttributes(service, container, page)
             return nil
 
         }

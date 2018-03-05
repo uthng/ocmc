@@ -63,7 +63,6 @@ func setFocusNode(page *console.Page) {
 // handles key event for navigation
 func setupTableNodes(container string, page *console.Page) error {
     var tableNodes *tview.Table
-
     data, _ := page.Data.(*types.PageClusterData)
 
     // Check if table already exists. If not, create it. Otherwise reuse it
@@ -165,6 +164,9 @@ func setupTableNodes(container string, page *console.Page) error {
                 return nil
             }
             data.App.GetPages().AddPage(host, pageConsole, true, true)
+            return nil
+        case tcell.KeyF5:
+            setupTableNodes(container, page)
             return nil
         }
 
