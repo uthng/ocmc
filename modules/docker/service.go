@@ -154,6 +154,7 @@ func setupTableService(container string, page *console.Page) error {
             if err != nil {
                 fmt.Println(err)
             }
+            return nil
         case tcell.KeyDelete:
             row, _ := tableService.GetSelection()
             // -1 because first row is table header
@@ -162,6 +163,9 @@ func setupTableService(container string, page *console.Page) error {
             if err != nil {
                 fmt.Println(err)
             }
+            // After deleting menu, refresh the service table
+            setupTableService(container, page)
+            return nil
         }
         return event
     })
