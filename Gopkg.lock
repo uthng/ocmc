@@ -306,12 +306,13 @@
   branch = "master"
   name = "github.com/uthng/common"
   packages = [
+    "clipboard",
     "docker",
     "k8s",
     "ssh",
     "utils"
   ]
-  revision = "337bbbde217c3dd5cb3491908bb4b863655b7e10"
+  revision = "03da3ed7cec4af35d8974dc9370960811a00bd96"
 
 [[projects]]
   branch = "master"
@@ -512,6 +513,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "b4b1532ee5d5911d2f990b9842dc5648c71096409cc656071e56ea6629fd2318"
+  inputs-digest = "47c5fac7a3ef281dc19d9f901b4e3ea1bdf043338fa4b3aea280bc56db9b9f25"
   solver-name = "gps-cdcl"
   solver-version = 1

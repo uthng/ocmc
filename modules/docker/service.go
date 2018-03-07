@@ -107,6 +107,9 @@ func setupTableService(container string, page *console.Page) error {
         return err
     }
 
+    // Sort by default alphabet
+    sort.Slice(swarmServices, func(i, j int) bool { return swarmServices[i].Spec.Annotations.Name < swarmServices[j].Spec.Annotations.Name })
+
     // Build service table
     for i, service := range swarmServices {
         //image := strings.Split(service.Spec.TaskTemplate.ContainerSpec.Image, "@")[0]
@@ -127,7 +130,7 @@ func setupTableService(container string, page *console.Page) error {
 
     // Handle other event key than Enter
     tableService.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
-        //fmt.Println("Key pressed")
+        //fmt.Println("Key presse)
         switch event.Key() {
         case tcell.KeyEsc:
             list, _ := page.GetElemList("list_menu")
@@ -140,6 +143,25 @@ func setupTableService(container string, page *console.Page) error {
         case tcell.KeyF5:
             setupTableService(container, page)
             return nil
+        case tcell.KeyCtrlU:
+            // Get current item
+            row, _ := tableService.GetSelection()
+            // -1 because first row is table header
+            service := swarmServices[row-1]
+            spec := &service.Spec
+            spec.TaskTemplate.ForceUpdate++
+            _, err := client.UpdateSwarmService(ctx, service.ID, service.Meta.Version, *spec, nil)
+            if err != nil {
+                fmt.Println(err)
+            }
+        case tcell.KeyDelete:
+            row, _ := tableService.GetSelection()
+            // -1 because first row is table header
+            service := swarmServices[row-1]
+            err := client.ServiceRemove(ctx, service.ID)
+            if err != nil {
+                fmt.Println(err)
+            }
         }
         return event
     })
