@@ -300,6 +300,8 @@ func setupTableServiceAttributes(service string, container string, page *console
             return nil
         case tcell.KeyF5:
             setupTableServiceAttributes(service, container, page)
+            // Refresh also container table
+            setupTableServiceContainers(service, container, page)
             return nil
 
         }
