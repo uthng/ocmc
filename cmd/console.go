@@ -89,16 +89,20 @@ func initApp() {
 
 func handlerKeyEvent(event *tcell.EventKey) *tcell.EventKey {
     switch event.Key() {
+    // Move to next page
     case tcell.KeyPgUp:
         app.GetPages().SwitchToPrevPage()
+
+    // Move to previous page
     case tcell.KeyPgDn:
         app.GetPages().SwitchToNextPage()
-    case tcell.KeyF2:
-        //app.GetPages().SwitchToPage("cluster")
-        //page, _ := app.GetPages().GetPage("TVL PPD FR")
-        //clusters, _ := page.GetElemList("list_clusters")
 
-        //app.SetFocus(clusters)
+    // Close current page
+    case tcell.KeyCtrlQ:
+        currentPage := app.GetPages().CurrentPage
+        if currentPage != "Home" && currentPage != "Help" {
+            app.GetPages().RemovePage(app.GetPages().CurrentPage)
+        }
 
     case tcell.KeyF10:
         app.Stop()
