@@ -391,11 +391,10 @@ func setupTableServiceContainers(service string, container string, page *console
             t, _ := page.GetElemTable("table_attributes")
             data.App.SetFocus(t)
             return nil
-         //case tcell.KeyTab:
-            //table, _ := page.GetElemTable("table_attributes")
-            //data.App.SetFocus(table)
-            //return nil
-
+         case tcell.KeyTab:
+            l, _ := page.GetElemList("list_clusters")
+            data.App.SetFocus(l)
+            return nil
         }
         return event
     })
