@@ -163,6 +163,8 @@ func setupTableService(container string, page *console.Page) error {
             if err != nil {
                 fmt.Println(err)
             }
+            // After updating menu, refresh the service table
+            setupTableService(container, page)
             return nil
         case tcell.KeyDelete:
             row, _ := tableService.GetSelection()
