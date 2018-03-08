@@ -17,6 +17,10 @@ import (
     "github.com/uthng/ocmc/console"
 )
 
+// First element of service table
+var lastSelectedServiceRow = 1
+var lastSelectedServiceCol = 0
+
 // setupLayoutService initializes zone containing different elements of
 // service
 func setupLayoutService(container string, page *console.Page) error {
@@ -118,9 +122,14 @@ func setupTableService(container string, page *console.Page) error {
     }
 
     // Point to 1st elem of service table
-    //tableService.Select(1, 0)
-    setupTableServiceAttributes(tableService.GetCell(1, 0).Text, "display_details", page)
-    setupTableServiceContainers(tableService.GetCell(1, 0).Text, "display_details", page)
+    tableService.Select(lastSelectedServiceRow, lastSelectedServiceCol)
+    setupTableServiceAttributes(tableService.GetCell(lastSelectedServiceRow, lastSelectedServiceCol).Text, "display_details", page)
+    setupTableServiceContainers(tableService.GetCell(lastSelectedServiceRow, lastSelectedServiceCol).Text, "display_details", page)
+
+    // Handle navigation between table cells
+    tableService.SetSelectionChangedFunc(func(row int, column int) {
+        lastSelectedServiceRow = row
+    })
 
     // Handle Enter key event on each service
     tableService.SetSelectedFunc(func(row int, column int) {

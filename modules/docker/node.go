@@ -248,16 +248,16 @@ func setupTableNodeContainers(server string, container string, page *console.Pag
 
     // Handle other event key than Enter
     table.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
-        //fmt.Println("Key pressed")
+        fmt.Println("Key pressed")
         switch event.Key() {
         case tcell.KeyEsc:
             t, _ := page.GetElemTable("table_nodes")
             data.App.SetFocus(t)
             return nil
-         //case tcell.KeyTab:
-            //table, _ := page.GetElemTable("table_attributes")
-            //data.App.SetFocus(table)
-            //return nil
+         case tcell.KeyTab:
+            l, _ := page.GetElemList("list_clusters")
+            data.App.SetFocus(l)
+            return nil
         }
         return event
     })
