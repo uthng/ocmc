@@ -284,7 +284,6 @@ func setupTableServiceAttributes(service string, container string, page *console
 
     }
 
-
     // Handle other event key than Enter
     table.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
         //fmt.Println("Key pressed")
@@ -380,6 +379,9 @@ func setupTableServiceContainers(service string, container string, page *console
         table.SetCell(i+1, 4, &tview.TableCell{Text: task.Meta.CreatedAt.UTC().Format(time.UnixDate), Align: tview.AlignLeft, Color: tcell.ColorWhite, MaxWidth: 30 })
         table.SetCell(i+1, 5, &tview.TableCell{Text: task.Meta.UpdatedAt.UTC().Format(time.UnixDate), Align: tview.AlignLeft, Color: tcell.ColorWhite, MaxWidth: 30 })
     }
+
+    // Always scroll the table to the beginning
+    table.ScrollToBeginning()
 
     // Handle other event key than Enter
     table.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
